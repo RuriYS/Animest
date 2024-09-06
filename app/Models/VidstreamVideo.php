@@ -9,5 +9,17 @@ class VidstreamVideo extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'episode_id';
+    protected $primaryKey = 'id';
+
+    protected $fillable = [
+        'id',
+        'meta',
+        'video'
+    ];
+
+    protected $casts = [
+        'id' => 'string',
+        'meta' => 'array',
+        'video' => 'array'
+    ];
 }

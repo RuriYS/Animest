@@ -66,11 +66,6 @@ class VidstreamVideoController extends Controller
         //
     }
 
-    /**
-     * Get using the API
-     * @param string $id
-     * @return mixed|\Illuminate\Http\JsonResponse
-     */
     public function get(string $id)
     {
         $items = Roach::collectSpider(
@@ -78,12 +73,21 @@ class VidstreamVideoController extends Controller
             context: ['id' => $id]
         );
 
-        $results = array_reduce(
-            $items,
-            fn($carry, $item) => array_merge($carry, $item->all()),
-            []
-        );
+        $results = array_map(fn($item) => $item->all(), $items);
 
-        return response()->json($results);
+        $id = $results[1]['episode_id'];
+        $meta = array_values(array_filter($results[0]['related'], function ($item) use ($id) {
+            $key = key($item);
+            return $key === $id;
+        }));
+
+        $video = VidstreamVideo::updateOrCreate([
+            'id' => $id
+        ], [
+            'meta' => $meta ? $meta[0][$id] : null,
+            'video' => $results[2] ?? null
+        ]);
+
+        return response()->json($video);
     }
 }
