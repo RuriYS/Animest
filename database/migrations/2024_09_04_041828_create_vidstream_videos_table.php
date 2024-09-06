@@ -12,12 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vidstream_videos', function (Blueprint $table) {
-            $table->string('episode_id');
-            $table->string('video_id');
-            $table->string('type');
-            $table->string('download_uri');
-            $table->string('stream_main');
-            $table->string('stream_bak');
+            $table->string('episode_id')->primary();    // eg; no-game-no-life-episode-1
+            $table->string('title');                    // eg; No Game No Life Episode 1
+            $table->string('video_id');                 // unique 8 characters identifier
+            $table->string('type');                     // SUB/DUB
+            // $table->string('download_uri');             // uri
+            $table->string('source');                   // m3u8 source file
+            $table->string('source_bk');                // m3u8 backup source file
+            $table->string('date_added');               // either YYYY-MM-DD HH:MM:SS or relative (N hours/minutes/seconds ago) need format
         });
     }
 
