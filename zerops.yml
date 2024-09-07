@@ -1,0 +1,17 @@
+zerops:
+  - setup: animei
+    build:
+      base: php@8.3
+
+      buildCommands:
+        - composer install --optimize-autoloader --no-dev
+
+      deployFiles: ./
+
+      cache:
+        - vendor
+        - composer.lock
+
+    run:
+      base: php-nginx@8.3
+      siteConfigPath: site.conf
