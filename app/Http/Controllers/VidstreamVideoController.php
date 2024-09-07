@@ -6,6 +6,7 @@ use App\Http\Requests\StoreVidstreamVideoRequest;
 use App\Http\Requests\UpdateVidstreamVideoRequest;
 use App\Models\VidstreamVideo;
 use App\Spiders\VidstreamVideoSpider;
+use Illuminate\Support\Facades\Log;
 use RoachPHP\Roach;
 
 class VidstreamVideoController extends Controller
@@ -15,7 +16,8 @@ class VidstreamVideoController extends Controller
      */
     public function index()
     {
-        //
+        $videos = VidstreamVideo::all();
+        return response()->json($videos);
     }
 
     /**
@@ -37,10 +39,18 @@ class VidstreamVideoController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(VidstreamVideo $vidstreamVideo)
+    public function show(string $anime_id, int $index)
     {
-        //
+        $id = "{$anime_id}-episode-{$index}";
+        $video = VidstreamVideo::find($id);
+
+        if ($video) {
+            return response()->json($video);
+        } else {
+            return response()->json(['error' => 'Video not found'], 404);
+        }
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -75,6 +85,11 @@ class VidstreamVideoController extends Controller
 
         $results = array_map(fn($item) => $item->all(), $items);
 
+        $zero = $results[0] ?? null;
+        if ($zero && array_key_exists('errors', $zero)) {
+            return response()->json($zero);
+        }
+
         $id = $results[1]['episode_id'];
         $meta = array_values(array_filter($results[0]['related'], function ($item) use ($id) {
             $key = key($item);
@@ -88,6 +103,6 @@ class VidstreamVideoController extends Controller
             'video' => $results[2] ?? null
         ]);
 
-        return response()->json($video);
+        return $video;
     }
 }
