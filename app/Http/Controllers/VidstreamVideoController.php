@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreVidstreamVideoRequest;
 use App\Http\Requests\UpdateVidstreamVideoRequest;
+use App\Jobs\ProcessVidstreamVideo;
 use App\Models\VidstreamVideo;
 use App\Spiders\VidstreamVideoSpider;
 use Illuminate\Support\Facades\Log;
@@ -78,31 +79,8 @@ class VidstreamVideoController extends Controller
 
     public function get(string $id)
     {
-        $items = Roach::collectSpider(
-            VidstreamVideoSpider::class,
-            context: ['id' => $id]
-        );
+        ProcessVidstreamVideo::dispatch($id);
 
-        $results = array_map(fn($item) => $item->all(), $items);
-
-        $zero = $results[0] ?? null;
-        if ($zero && array_key_exists('errors', $zero)) {
-            return response()->json($zero);
-        }
-
-        $id = $results[1]['episode_id'];
-        $meta = array_values(array_filter($results[0]['related'], function ($item) use ($id) {
-            $key = key($item);
-            return $key === $id;
-        }));
-
-        $video = VidstreamVideo::updateOrCreate([
-            'id' => $id
-        ], [
-            'meta' => $meta ? $meta[0][$id] : null,
-            'video' => $results[2] ?? null
-        ]);
-
-        return $video;
+        return response()->noContent(200);
     }
 }

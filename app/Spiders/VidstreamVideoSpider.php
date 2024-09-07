@@ -4,11 +4,10 @@ namespace App\Spiders;
 
 use App\Processors\VidstreamItemProcessor;
 use App\Utils\Ajax;
+use App\Utils\Dateparser;
 use Generator;
 use Log;
 use RoachPHP\Downloader\Middleware\UserAgentMiddleware;
-use RoachPHP\Extensions\LoggerExtension;
-use RoachPHP\Extensions\StatsCollectorExtension;
 use RoachPHP\Http\Request;
 use RoachPHP\Http\Response;
 use RoachPHP\Spider\BasicSpider;
@@ -27,13 +26,13 @@ class VidstreamVideoSpider extends BasicSpider
         return [
             new Request(
                 'GET',
-                'https://s3taku.com/videos/' . $this->context['id'] ?? "no-game-no-life-episode-1",
+                'https://s3taku.com/videos/' . $this->context['id'],
                 [$this, 'parse']
             )
         ];
     }
 
-    public int $concurrency = 2;
+    public int $concurrency = 10;
 
     public int $requestDelay = 0;
 
@@ -44,17 +43,17 @@ class VidstreamVideoSpider extends BasicSpider
         ],
     ];
 
-    public array $extensions = [
-        LoggerExtension::class,
-        StatsCollectorExtension::class,
-    ];
-
     public array $itemProcessors = [
         VidstreamItemProcessor::class,
     ];
 
+    public array $extensions = [];
+
     public function parse(Response $response): Generator
     {
+        Log::debug("Parsing {$this->context['id']}");
+
+        $dateparser = new Dateparser();
         $iframe = $response->filter('.play-video iframe[src]');
 
         if (!$iframe->getNode(0)) {
@@ -65,7 +64,7 @@ class VidstreamVideoSpider extends BasicSpider
                     fn(Crawler $node) => [
                         explode('/videos/', urldecode($node->filter('a')->first()->attr('href')))[1] => [
                             'title' => urldecode($node->filter('.name')->text()),
-                            'date_added' => $node->filter('.meta .date')->text(),
+                            'date_added' => $dateparser->parseDate($node->filter('.meta .date')->text()),
                             'splash' => $node->filter('.img .picture img')->attr('src'),
                         ]
                     ]
@@ -77,6 +76,7 @@ class VidstreamVideoSpider extends BasicSpider
 
     public function parseIframe(Response $response): Generator
     {
+        // Log::debug("Parsing iframe");
         $ajax = new Ajax(
             config('app.encryption_key'),
             config('app.iv_key'),
@@ -111,6 +111,7 @@ class VidstreamVideoSpider extends BasicSpider
 
     public function parseVideoData(Response $response)
     {
+        // Log::debug("Parsing videodata");
         $ajax = new Ajax(
             config('app.decryption_key'),
             config('app.iv_key'),
