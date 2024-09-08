@@ -33,13 +33,13 @@ const Footer = () => {
         <FooterContainer>
             <Container>
                 <LinksContainer>
-                    <FooterLink to='/' bold>
+                    <FooterLink to='/' bold={true}>
                         Animei.moe
                     </FooterLink>
-                    <FooterLink to='/terms' small>
+                    <FooterLink to='/terms' small={true}>
                         Terms & Privacy
                     </FooterLink>
-                    <FooterLink to='/contacts' small>
+                    <FooterLink to='/contacts' small={true}>
                         Contacts
                     </FooterLink>
                 </LinksContainer>

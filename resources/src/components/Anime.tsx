@@ -1,7 +1,11 @@
-import React from "react";
+import React from 'react';
+import Container from '../elements/Container';
 
 const Anime = () => (
-    <div></div>
-)
+    <Container>
+        <h1>Title here</h1>
+        <h1>Description</h1>
+    </Container>
+);
 
 export default Anime;

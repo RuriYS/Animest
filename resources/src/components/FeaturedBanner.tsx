@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Container from './Container';
+import Container from '../elements/Container';
 import { Link } from 'react-router-dom';
 import { FaCirclePlay } from 'react-icons/fa6';
 import { FaInfoCircle } from 'react-icons/fa';

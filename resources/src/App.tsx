@@ -1,12 +1,18 @@
-import { Anime, Collections, Home, News, Terms } from './components';
+import {
+    Anime,
+    Collections,
+    Home,
+    News,
+    Terms,
+    Footer,
+    Header,
+} from './components';
 import {
     BrowserRouter as Router,
     Routes,
     Route,
     useLocation,
 } from 'react-router-dom';
-import Footer from './components/Footer';
-import Header from './components/Header';
 import ReactDOM from 'react-dom/client';
 import React, {
     createContext,
@@ -15,7 +21,9 @@ import React, {
     useEffect,
     ReactNode,
 } from 'react';
-
+import styled from '@emotion/styled';
+import tw from 'twin.macro';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 interface HeaderContextType {
     headerVisible: boolean;
     setHeaderVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -60,23 +68,52 @@ const App = () => {
     );
 };
 
+const MainContainer = styled.main`
+    ${tw`flex flex-col`}
+
+    .fade-enter {
+        opacity: 0;
+    }
+
+    .fade-enter-active {
+        opacity: 1;
+        transition: opacity 500ms ease-in-out;
+    }
+
+    .fade-exit {
+        opacity: 1;
+    }
+
+    .fade-exit-active {
+        opacity: 0;
+        transition: opacity 500ms ease-in-out;
+    }
+`;
+
 const Main = () => {
+    const location = useLocation();
     const { headerVisible } = useHeader();
 
     return (
-        <main className='flex flex-col'>
+        <MainContainer>
             {headerVisible && <Header />}
-            <div className='flex-grow min-h-full'>
-                <Routes>
-                    <Route path='/' element={<Home />} />
-                    <Route path='/anime' element={<Anime />} />
-                    <Route path='/collections' element={<Collections />} />
-                    <Route path='/news' element={<News />} />
-                    <Route path='/terms' element={<Terms />} />
-                </Routes>
-            </div>
+            <TransitionGroup className={'flex-grow min-h-full'}>
+                <CSSTransition
+                    key={location.pathname}
+                    classNames='fade'
+                    timeout={300}
+                >
+                    <Routes location={location}>
+                        <Route path='/' element={<Home />} />
+                        <Route path='/anime' element={<Anime />} />
+                        <Route path='/collections' element={<Collections />} />
+                        <Route path='/news' element={<News />} />
+                        <Route path='/terms' element={<Terms />} />
+                    </Routes>
+                </CSSTransition>
+            </TransitionGroup>
             <Footer />
-        </main>
+        </MainContainer>
     );
 };
 
