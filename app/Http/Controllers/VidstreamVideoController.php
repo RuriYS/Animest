@@ -6,19 +6,16 @@ use App\Http\Requests\StoreVidstreamVideoRequest;
 use App\Http\Requests\UpdateVidstreamVideoRequest;
 use App\Jobs\ProcessVidstreamVideo;
 use App\Models\VidstreamVideo;
-use App\Spiders\VidstreamVideoSpider;
-use Illuminate\Support\Facades\Log;
-use RoachPHP\Roach;
 
 class VidstreamVideoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(string $anime_id)
     {
-        $videos = VidstreamVideo::all();
-        return response()->json($videos);
+        $index = VidstreamVideo::find($anime_id);
+        return response()->json($index);
     }
 
     /**
