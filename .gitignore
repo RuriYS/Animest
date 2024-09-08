@@ -4,5 +4,7 @@ vendor
 bootstrap/cache
 public/css
 public/js
+public/hot
+public/mix-manifest.json
 
 .env
