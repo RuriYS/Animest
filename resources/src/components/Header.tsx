@@ -7,7 +7,7 @@ const Header = () => {
             <header className='flex justify-between items-center outline-gray-400 p-4 text-white max-w-[2000px] mx-auto'>
                 <div className='flex items-center'>
                     <Link to='/'>
-                        <h1 className='text-3xl font-bold'>Animei</h1>
+                        <h1 className='text-3xl font-bold'>Animest</h1>
                     </Link>
                     <nav className='ml-10 space-x-4'>
                         <Link to='/' className='hover:text-gray-300'>
