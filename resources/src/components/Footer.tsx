@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaTelegram, FaDiscord, FaYoutube, FaInstagram } from 'react-icons/fa';
-import Container from '../elements/Container';
+import Constraint from '../elements/Constraint';
 import styled from '@emotion/styled';
 import { Link } from 'react-router-dom';
 import tw from 'twin.macro';
@@ -11,7 +11,7 @@ interface FooterLinkProps {
 }
 
 const FooterContainer = styled.footer`
-    ${tw`w-full bg-black text-gray-400 p-4 flex justify-between`}
+    ${tw`w-full mt-auto bg-black text-gray-400 p-4 flex justify-between`}
 `;
 
 const LinksContainer = styled.div`
@@ -22,42 +22,32 @@ const SocialLinks = styled.div`
     ${tw`flex space-x-4`}
 `;
 
-const FooterLink = styled(Link)<FooterLinkProps>`
-    ${tw`hover:text-white`}
-    ${({ bold }) => bold && tw`font-bold`}
-    ${({ small }) => small && tw`text-xs`}
-`;
+const FooterLink = styled(Link)(
+    ({ variant }: { variant?: 'bold' | 'small' }) => [
+        tw`hover:text-white truncate`,
+        variant == 'bold' && tw`font-bold`,
+        variant == 'small' && tw`text-xs`,
+    ],
+);
 
 const Footer = () => {
     return (
         <FooterContainer>
-            <Container>
+            <Constraint>
                 <LinksContainer>
-                    <FooterLink to='/' bold={true}>
-                        Animei.moe
+                    <FooterLink to='/' variant='bold'>
+                        Animest.land
                     </FooterLink>
-                    <FooterLink to='/terms' small={true}>
+                    <FooterLink to='/terms' variant='small'>
                         Terms & Privacy
-                    </FooterLink>
-                    <FooterLink to='/contacts' small={true}>
-                        Contacts
                     </FooterLink>
                 </LinksContainer>
                 <SocialLinks>
                     <FooterLink to='#'>
-                        <FaTelegram size={20} />
-                    </FooterLink>
-                    <FooterLink to='#'>
                         <FaDiscord size={20} />
                     </FooterLink>
-                    <FooterLink to='#'>
-                        <FaYoutube size={20} />
-                    </FooterLink>
-                    <FooterLink to='#'>
-                        <FaInstagram size={20} />
-                    </FooterLink>
                 </SocialLinks>
-            </Container>
+            </Constraint>
         </FooterContainer>
     );
 };

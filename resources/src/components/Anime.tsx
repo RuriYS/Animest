@@ -1,11 +1,11 @@
 import React from 'react';
-import Container from '../elements/Container';
+import Constraint from '../elements/Constraint';
 
 const Anime = () => (
-    <Container>
+    <Constraint>
         <h1>Title here</h1>
         <h1>Description</h1>
-    </Container>
+    </Constraint>
 );
 
 export default Anime;

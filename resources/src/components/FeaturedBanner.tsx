@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import Container from '../elements/Container';
+import Constraint from '../elements/Constraint';
 import { Link } from 'react-router-dom';
 import { FaCirclePlay } from 'react-icons/fa6';
 import { FaInfoCircle } from 'react-icons/fa';
+import Button from '../elements/Button';
 
 const FeaturedBanner = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const featured = [
         {
             id: 'shikanoko-nokonoko-koshitantan',
+            episode: 1,
             title: 'My Deer Friend Nokotan',
             brief: 'Torako Koshi is the epitome of perfection. With her peerless beauty, top-notch grades, and position as student council president, her popularity in school is unrivaled. However, she harbors a dark secret—she was a delinquent back in middle school—and this is something she conceals to the best of her abilities.',
             banner: {
@@ -50,40 +52,40 @@ const FeaturedBanner = () => {
                     'absolute z-10 h-full content-center bottom-0 left-0 w-full text-white bg-gradient-to-b from-transparent to-black'
                 }
             >
-                <Container>
+                <Constraint>
                     <div
                         className={
                             'flex space-y-4 flex-col w-[70%] lg:w-[50%] p-4 drop-shadow-lg'
                         }
                     >
-                        <h1 className={'text-5xl font-bold'}>
+                        <h1 className={'text-3xl md:text-5xl font-bold'}>
                             {featured[currentIndex].title}
                         </h1>
                         <p
                             className={
-                                'text-sm lg:text-md overflow-hidden text-ellipsis line-clamp-4'
+                                'text-xs lg:text-md overflow-hidden text-ellipsis line-clamp-4'
                             }
                         >
                             {featured[currentIndex].brief}
                         </p>
                         <div className='flex space-x-2'>
                             <Link to={`/anime/${featured[currentIndex].id}`}>
-                                <button className='w-32 h-10 p-2 text-sm bg-white text-black font-semibold rounded-lg flex items-center justify-center space-x-2'>
+                                <Button variant='primary'>
                                     <FaInfoCircle size={16} />
                                     <span>Learn More</span>
-                                </button>
+                                </Button>
                             </Link>
                             <Link
-                                to={`/anime/${featured[currentIndex].id}-episode-1`}
+                                to={`/watch/${featured[currentIndex].id}/episode/1`}
                             >
-                                <button className='w-32 h-10 p-2 text-sm bg-gray-800 text-white font-semibold rounded-lg flex items-center justify-center space-x-2'>
+                                <Button variant='secondary'>
                                     <FaCirclePlay size={16} />
                                     <span>Watch</span>
-                                </button>
+                                </Button>
                             </Link>
                         </div>
                     </div>
-                </Container>
+                </Constraint>
             </div>
         </div>
     );
