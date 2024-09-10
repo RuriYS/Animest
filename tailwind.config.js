@@ -1,8 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-/* eslint-disable no-undef */
-
-module.exports = {
-    darkMode: 'media',
+export default {
     variants: {
         extend: {},
     },

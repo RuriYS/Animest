@@ -2,8 +2,7 @@ node_modules
 vendor
 
 bootstrap/cache
-public/css
-public/js
+public/build
 public/hot
 public/mix-manifest.json
 

@@ -1,16 +1,24 @@
 {
     "private": true,
+    "type": "module",
+    "babelMacros": {
+        "twin": {
+            "preset": "emotion"
+        }
+    },
     "scripts": {
-        "build": "yarn mix",
-        "watch": "yarn mix watch",
-        "hot": "yarn mix watch --hot",
-        "prod": "yarn mix --production"
+        "dev": "vite",
+        "build": "vite build"
     },
     "devDependencies": {
         "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+        "@babel/plugin-transform-react-jsx": "^7.25.2",
         "@babel/plugin-transform-runtime": "^7.25.4",
         "@babel/preset-env": "^7.25.4",
+        "@emotion/babel-plugin-jsx-pragmatic": "^0.3.0",
         "@pmmmwh/react-refresh-webpack-plugin": "^0.5.0-rc.0",
+        "@vitejs/plugin-react": "^4.3.1",
+        "@vitejs/plugin-vue": "^5.1.3",
         "axios": "^1.7.7",
         "babel-plugin-macros": "^3.1.0",
         "browser-sync": "^3.0.2",
@@ -18,8 +26,10 @@
         "eslint": "^9.10.0",
         "eslint-plugin-react": "^7.35.2",
         "glob": "^11.0.0",
+        "laravel-vite-plugin": "^1.0.5",
         "react-refresh": "^0.14.2",
         "resolve-url-loader": "^5.0.0",
+        "vite": "^5.4.3",
         "webpack": "^5.94.0"
     },
     "dependencies": {
@@ -38,6 +48,7 @@
         "@typescript-eslint/eslint-plugin": "^8.3.0",
         "@typescript-eslint/parser": "^8.3.0",
         "@vidstack/react": "^1.12.9",
+        "add": "^2.0.6",
         "autoprefixer": "^10.4.20",
         "hls.js": "^1.5.15",
         "laravel-mix": "^6.0.49",
@@ -56,6 +67,9 @@
         "tailwindcss": "^3.4.10",
         "ts-loader": "^9.5.1",
         "twin.macro": "^3.4.1",
-        "typescript": "^5.5.4"
+        "typescript": "^5.5.4",
+        "vite-plugin-node-polyfills": "^0.22.0",
+        "vite-tsconfig-paths": "^5.0.1",
+        "yarn": "^1.22.22"
     }
 }

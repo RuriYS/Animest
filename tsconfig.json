@@ -10,5 +10,5 @@
         "forceConsistentCasingInFileNames": true,
         "noImplicitAny": true,
     },
-    "include": [ "resources/src/**/*" ]
+    "include": [ "resources/src", "resources/types" ]
 }
