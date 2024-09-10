@@ -7,7 +7,6 @@
         "prod": "yarn mix --production"
     },
     "devDependencies": {
-        "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
         "@babel/plugin-syntax-dynamic-import": "^7.8.3",
         "@babel/plugin-transform-runtime": "^7.25.4",
         "@babel/preset-env": "^7.25.4",
@@ -21,8 +20,7 @@
         "glob": "^11.0.0",
         "react-refresh": "^0.14.2",
         "resolve-url-loader": "^5.0.0",
-        "webpack": "^5.94.0",
-        "webpack-cli": "^5.1.4"
+        "webpack": "^5.94.0"
     },
     "dependencies": {
         "@babel/core": "^7.25.2",
@@ -31,7 +29,6 @@
         "@emotion/react": "^11.13.3",
         "@emotion/styled": "^11.13.0",
         "@fontsource/roboto": "^5.0.14",
-        "@fortawesome/fontawesome": "^1.1.8",
         "@fortawesome/fontawesome-free": "^6.6.0",
         "@types/react": "^18.3.5",
         "@types/react-dom": "^18.3.0",
