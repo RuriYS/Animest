@@ -1,7 +1,6 @@
-import React, { useRef, useState } from 'react';
-import { useLocation, Routes, Route, Navigate } from 'react-router-dom';
-import { Anime, Home, News, Collections, Terms, Watch } from './index';
-import { redirect } from 'react-router-dom';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { Anime, Home, News, Collections, Terms, Watch } from './components';
 
 const Main = () => {
     return (

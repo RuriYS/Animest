@@ -1,16 +1,16 @@
+import { MediaPlayer, MediaProvider } from '@vidstack/react';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import styled from '@emotion/styled';
-import tw from 'twin.macro';
-import { MediaPlayer, MediaProvider } from '@vidstack/react';
 import {
     PlyrLayout,
     plyrLayoutIcons,
 } from '@vidstack/react/player/layouts/plyr';
 import { Constraint } from '../elements';
-import moment from 'moment';
 import { Link } from 'react-router-dom';
+import styled from '@emotion/styled';
+import axios from 'axios';
+import moment from 'moment';
+import tw from 'twin.macro';
 
 const WatchContainer = styled.div`
     ${tw`flex flex-col gap-y-8 w-full bg-black`}
