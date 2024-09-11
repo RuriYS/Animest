@@ -7,16 +7,16 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('vidstream_videos', function (Blueprint $table) {
+        Schema::create('episodes', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->json('meta');
-            $table->json('video');
-            $table->timestamps();
+            $table->string('episode_index')->nullable();
+            $table->string('upload_date')->nullable();
+            $table->json('video')->nullable();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('vidstream_videos');
+        Schema::dropIfExists('episodes');
     }
 };

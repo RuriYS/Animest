@@ -56,27 +56,29 @@ class VidstreamVideoSpider extends BasicSpider
         $dateparser = new Dateparser();
         $iframe = $response->filter('.play-video iframe[src]');
 
-        if (!$iframe->getNode(0)) {
-            yield $this->item(['errors' => "Didn't find anything :<"]);
-        } else {
-            yield $this->item([
-                'related' => $response->filter('.listing.lists li')->each(
-                    fn(Crawler $node) => [
-                        explode('/videos/', urldecode($node->filter('a')->first()->attr('href')))[1] => [
-                            'title' => urldecode($node->filter('.name')->text()),
-                            'date_added' => $dateparser->parseDate($node->filter('.meta .date')->text()),
-                            'splash' => $node->filter('.img .picture img')->attr('src'),
-                        ]
-                    ]
-                )
-            ]);
-            yield $this->request('GET', $iframe->attr('src'), 'parseIframe');
-        }
+        // Anime Details
+        yield $this->item([
+            'title' => $response->filter('.video-details .date')->innerText(true),
+            'description' => $response->filter('.video-details #rmjs-1')->innerText(true),
+        ]);
+
+        // Related Episodes
+        yield $this->item(
+            $response->filter('.listing.lists li')->each(
+                fn(Crawler $node) => [
+                    'episode_id' => explode('/videos/', urldecode($node->filter('a')->first()->attr('href')))[1],
+                    'title' => urldecode($node->filter('.name')->text()),
+                    'date_added' => $dateparser->parseDate($node->filter('.meta .date')->text()),
+                    'splash' => $node->filter('.img .picture img')->attr('src'),
+                ]
+            )
+        );
+
+        yield $this->request('GET', $iframe->attr('src'), 'parseIframe');
     }
 
     public function parseIframe(Response $response): Generator
     {
-        // Log::debug("Parsing iframe");
         $ajax = new Ajax(
             config('app.encryption_key'),
             config('app.iv_key'),
@@ -89,6 +91,7 @@ class VidstreamVideoSpider extends BasicSpider
         parse_str(parse_url($url, PHP_URL_QUERY), $query);
         $episode_id = preg_replace('/[^a-z\s\d]/', '', strtolower(urldecode($query['title'])));
 
+        // Video data
         yield $this->item([
             'title' => urldecode(str_replace('+', ' ', $response->filter('#title')->attr('value'))),
             'episode_id' => str_replace(' ', '-', $episode_id),

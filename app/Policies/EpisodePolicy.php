@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\VidstreamVideo;
+use App\Models\Episode;
 use Illuminate\Auth\Access\Response;
 
-class VidstreamVideoPolicy
+class EpisodePolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,7 +19,7 @@ class VidstreamVideoPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, VidstreamVideo $vidstreamVideo): bool
+    public function view(User $user, Episode $vidstreamVideo): bool
     {
         //
     }
@@ -35,7 +35,7 @@ class VidstreamVideoPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, VidstreamVideo $vidstreamVideo): bool
+    public function update(User $user, Episode $vidstreamVideo): bool
     {
         //
     }
@@ -43,7 +43,7 @@ class VidstreamVideoPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, VidstreamVideo $vidstreamVideo): bool
+    public function delete(User $user, Episode $vidstreamVideo): bool
     {
         //
     }
@@ -51,7 +51,7 @@ class VidstreamVideoPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, VidstreamVideo $vidstreamVideo): bool
+    public function restore(User $user, Episode $vidstreamVideo): bool
     {
         //
     }
@@ -59,7 +59,7 @@ class VidstreamVideoPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, VidstreamVideo $vidstreamVideo): bool
+    public function forceDelete(User $user, Episode $vidstreamVideo): bool
     {
         //
     }

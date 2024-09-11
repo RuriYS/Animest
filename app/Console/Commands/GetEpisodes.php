@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\ProcessVidstreamVideo;
+use App\Jobs\GetVideo;
 use Illuminate\Console\Command;
 
 class GetEpisodes extends Command
@@ -35,7 +35,7 @@ class GetEpisodes extends Command
 
             $episodeId = "{$id}-episode-{$i}";
 
-            ProcessVidstreamVideo::dispatch($episodeId);
+            GetVideo::dispatch($episodeId);
 
             $this->info("Dispatched job for {$episodeId}");
         }
