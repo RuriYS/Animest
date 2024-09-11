@@ -52,27 +52,30 @@ class GetVideo implements ShouldQueue
         $episode = $results[2] ?? null;
         $source = $results[3] ?? null;
 
-        $id = $episode['episode_id'] ?? null;
+        $epid = $episode['episode_id'] ?? null;
+        $tid = explode('-episode', $epid)[0] ?? null;
 
-        $meta = array_values(array_filter($episodes, function ($item) use ($id) {
-            return $item['episode_id'] == $id;
+        $meta = array_values(array_filter($episodes, function ($item) use ($epid) {
+            return $item['episode_id'] == $epid;
         }))[0];
 
         Episode::updateOrCreate([
-            'id' => $id
+            'id' => $epid
         ], [
-            'episode_index' => explode('episode-', $id)[1] ?? null,
+            'episode_index' => explode('episode-', $epid)[1] ?? null,
+            'title_id' => $tid,
             'upload_date' => $meta['date_added'] ?? null,
             'video' => $source ?? null,
         ]);
 
         Anime::updateOrCreate([
-            'id' => explode('-episode', $id)[0],
+            'id' => $tid,
             'title' => $anime_details['title'] ?? null,
             'description' => $anime_details['description'] ?? null,
+            'splash' => $meta['splash'] ?? null,
         ], []);
 
-        Log::info("Episode saved (ID: $id)");
+        Log::info("Episode saved (ID: $epid)");
         return 0;
     }
 }

@@ -15,7 +15,6 @@ return new class extends Migration {
             $table->string('title')->nullable();
             $table->string('description')->nullable();
             $table->string('splash')->nullable();
-            $table->string('episodes')->nullable();
         });
     }
 

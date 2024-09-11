@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('episodes', function (Blueprint $table) {
             $table->string('id')->primary();
+            $table->string('title_id')->nullable();
             $table->string('episode_index')->nullable();
             $table->string('upload_date')->nullable();
             $table->json('video')->nullable();

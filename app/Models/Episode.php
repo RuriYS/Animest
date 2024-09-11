@@ -14,6 +14,7 @@ class Episode extends Model
     protected $fillable = [
         'id',
         'episode_index',
+        'title_id',
         'upload_date',
         'video',
     ];
@@ -21,6 +22,7 @@ class Episode extends Model
     protected $casts = [
         'id' => 'string',
         'episode_index' => 'string',
+        'title_id' => 'string',
         'upload_date' => 'string',
         'video' => 'array'
     ];

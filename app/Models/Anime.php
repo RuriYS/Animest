@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Anime extends Model
@@ -16,7 +15,6 @@ class Anime extends Model
         'title',
         'description',
         'splash',
-        'episodes',
     ];
 
     protected $casts = [
@@ -24,6 +22,5 @@ class Anime extends Model
         'title' => 'string',
         'description' => 'string',
         'splash' => 'string',
-        'episodes' => 'array',
     ];
 }
