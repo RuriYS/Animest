@@ -69,6 +69,28 @@ video {
     transition: opacity 800ms, transform 800ms;
 }
 
+.mobile-nav-enter {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+
+.mobile-nav-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 300ms ease-in-out;
+}
+
+.mobile-nav-exit {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-nav-exit-active {
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: all 300ms ease-in-out;
+}
+
 /*
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  * Player

@@ -22,6 +22,19 @@ const Navlinks = styled.div`
     ${tw`flex flex-col md:flex-row gap-x-6 gap-y-4 items-center rounded-lg transition-all duration-300 ease-in-out`}
 `;
 
+const LeftNav = styled.div`
+    ${tw`flex justify-between gap-x-4`}
+`;
+
+const RightNav = styled.div`
+    ${tw`hidden md:flex`}
+`;
+
+const MobileNav = styled.div`
+    ${tw`flex flex-col md:hidden p-4 rounded-lg h-full`}
+    background-color: rgba(0, 0, 0, 80%)
+`;
+
 const Header = () => {
     const [expanded, setExpanded] = useState(false);
     const nodeRef = useRef(null);
@@ -30,35 +43,45 @@ const Header = () => {
         <HeaderContainer>
             <HeaderContent>
                 <NavContainer>
-                    <div className='flex justify-between'>
+                    <LeftNav>
                         <Link to='/'>
                             <h1 className='text-2xl md:text-3xl font-bold'>
                                 Animest
                             </h1>
                         </Link>
+                        <Navlinks className='hidden md:flex'>
+                            <Link to='/home'>Home</Link>
+                            <Link to='/catalog'>Catalog</Link>
+                            <Link to='/news'>News</Link>
+                            <Link to='/collections'>Collections</Link>
+                        </Navlinks>
                         <FaBars
                             className='md:hidden'
                             size={24}
                             onClick={() => setExpanded(!expanded)}
                         />
-                    </div>
-                    <TransitionGroup>
-                        <CSSTransition
-                            in={expanded}
-                            nodeRef={nodeRef}
-                            timeout={300}
-                            classNames='slide'
-                            unmountOnExit
-                        >
+                    </LeftNav>
+                    <CSSTransition
+                        in={expanded}
+                        timeout={300}
+                        classNames='mobile-nav'
+                        unmountOnExit
+                        nodeRef={nodeRef}
+                    >
+                        <MobileNav ref={nodeRef}>
                             <Navlinks>
                                 <Link to='/home'>Home</Link>
                                 <Link to='/catalog'>Catalog</Link>
                                 <Link to='/news'>News</Link>
                                 <Link to='/collections'>Collections</Link>
-                                <MorphableSearchBar />
                             </Navlinks>
-                        </CSSTransition>
-                    </TransitionGroup>
+                            <MorphableSearchBar />
+                        </MobileNav>
+                    </CSSTransition>
+
+                    <RightNav>
+                        <MorphableSearchBar />
+                    </RightNav>
                 </NavContainer>
             </HeaderContent>
         </HeaderContainer>
