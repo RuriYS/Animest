@@ -6,4 +6,5 @@ public/build
 public/hot
 public/mix-manifest.json
 
+package-lock.json
 .env
