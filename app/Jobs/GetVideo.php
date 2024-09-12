@@ -19,20 +19,11 @@ class GetVideo implements ShouldQueue
 
     protected $id;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param string $id
-     */
     public function __construct(string $id)
     {
         $this->id = $id;
     }
 
-
-    /**
-     * Execute the job.
-     */
     public function handle()
     {
         $items = Roach::collectSpider(
@@ -42,7 +33,6 @@ class GetVideo implements ShouldQueue
 
         $results = array_map(fn($item) => $item->all(), $items);
 
-        Log::debug(print_r($results, true));
         if (count($results) < 4) {
             return;
         }
@@ -66,6 +56,7 @@ class GetVideo implements ShouldQueue
             'title_id' => $tid,
             'upload_date' => $meta['date_added'] ?? null,
             'video' => $source ?? null,
+            'views' => 0
         ]);
 
         Anime::updateOrCreate([

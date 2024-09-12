@@ -34,6 +34,19 @@ class EpisodeController extends Controller
         ]);
     }
 
+    public function view(string $anime_id, string $index)
+    {
+        $episodeIdFormats = [
+            "{$anime_id}-episode-{$index}",
+            "{$anime_id}-{$index}"
+        ];
+
+        $episode = Episode::find($episodeIdFormats[0]) ?? Episode::find($episodeIdFormats[1]);
+        $episode->views += 1;
+        $episode->save();
+        return response($episode->views, 200);
+    }
+
     public function get(string $id)
     {
         GetVideo::dispatch($id);

@@ -13,6 +13,7 @@ return new class extends Migration {
             $table->string('episode_index')->nullable();
             $table->string('upload_date')->nullable();
             $table->json('video')->nullable();
+            $table->integer('views')->nullable();
         });
     }
 

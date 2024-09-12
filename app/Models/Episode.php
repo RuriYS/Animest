@@ -17,6 +17,7 @@ class Episode extends Model
         'title_id',
         'upload_date',
         'video',
+        'views',
     ];
 
     protected $casts = [
@@ -24,6 +25,7 @@ class Episode extends Model
         'episode_index' => 'string',
         'title_id' => 'string',
         'upload_date' => 'string',
-        'video' => 'array'
+        'video' => 'array',
+        'views' => 'integer'
     ];
 }

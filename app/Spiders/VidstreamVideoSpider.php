@@ -51,30 +51,33 @@ class VidstreamVideoSpider extends BasicSpider
 
     public function parse(Response $response): Generator
     {
-        Log::debug("Parsing {$this->context['id']}");
 
         $dateparser = new Dateparser();
         $iframe = $response->filter('.play-video iframe[src]');
 
-        // Anime Details
-        yield $this->item([
-            'title' => $response->filter('.video-details .date')->innerText(true),
-            'description' => $response->filter('.video-details #rmjs-1')->innerText(true),
-        ]);
+        if ($iframe->count() === 1) {
+            Log::debug("Parsing {$this->context['id']}");
 
-        // Related Episodes
-        yield $this->item(
-            $response->filter('.listing.lists li')->each(
-                fn(Crawler $node) => [
-                    'episode_id' => explode('/videos/', urldecode($node->filter('a')->first()->attr('href')))[1],
-                    'title' => urldecode($node->filter('.name')->text()),
-                    'date_added' => $dateparser->parseDate($node->filter('.meta .date')->text()),
-                    'splash' => $node->filter('.img .picture img')->attr('src'),
-                ]
-            )
-        );
+            // Anime Details
+            yield $this->item([
+                'title' => $response->filter('.video-details .date')->innerText(true),
+                'description' => $response->filter('.video-details #rmjs-1')->innerText(true),
+            ]);
 
-        yield $this->request('GET', $iframe->attr('src'), 'parseIframe');
+            // Related Episodes
+            yield $this->item(
+                $response->filter('.listing.lists li')->each(
+                    fn(Crawler $node) => [
+                        'episode_id' => explode('/videos/', urldecode($node->filter('a')->first()->attr('href')))[1],
+                        'title' => urldecode($node->filter('.name')->text()),
+                        'date_added' => $dateparser->parseDate($node->filter('.meta .date')->text()),
+                        'splash' => $node->filter('.img .picture img')->attr('src'),
+                    ]
+                )
+            );
+
+            yield $this->request('GET', $iframe->attr('src'), 'parseIframe');
+        }
     }
 
     public function parseIframe(Response $response): Generator

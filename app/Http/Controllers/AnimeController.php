@@ -27,6 +27,7 @@ class AnimeController extends Controller
             'exists' => !!$anime,
             'id' => $id,
             'title' => $anime->title,
+            'description' => $anime->description,
             'episodes' => $episodes,
             'splash' => $anime->splash,
         ]);

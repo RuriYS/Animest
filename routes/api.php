@@ -17,6 +17,7 @@ Route::prefix('/videos')
     ->group(function () {
         Route::get('/{anime_id}', [EpisodeController::class, 'index']);
         Route::get('/{anime_id}/{index}', [EpisodeController::class, 'show']);
+        Route::post('/{anime_id}/{index}', [EpisodeController::class, 'view']);
     });
 
 Route::prefix('/animes')
