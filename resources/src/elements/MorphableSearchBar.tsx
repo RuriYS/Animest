@@ -17,14 +17,20 @@ const SearchIcon = styled.div`
 `;
 
 const SearchBar = styled.input<{ isExpanded: boolean }>`
-    ${tw`px-4 py-2 pl-12 bg-gray-800 text-white rounded-lg outline-none transition-all duration-300 ease-in-out`}
-    width: ${({ isExpanded }) => (isExpanded ? '12rem' : '40px')};
+    ${tw`px-4 h-8 py-1 w-full bg-neutral-900 text-white rounded-lg outline-none transition-all duration-300 ease-in-out`}
+
+    width: ${({ isExpanded }) => (isExpanded ? '100%' : '40px')};
     padding-left: ${({ isExpanded }) => (isExpanded ? '2rem' : '0.5rem')};
     cursor: ${({ isExpanded }) => (isExpanded ? 'text' : 'pointer')};
     opacity: ${({ isExpanded }) => (isExpanded ? 1 : 0)};
 
     &:focus {
-        ${tw`bg-slate-300 text-black`}
+        ${tw`bg-slate-300 text-black outline-none`}
+        box-shadow: none;
+    }
+
+    @media (min-width: 768px) {
+        width: ${({ isExpanded }) => (isExpanded ? '12rem' : '40px')};
     }
 `;
 
