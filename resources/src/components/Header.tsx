@@ -53,7 +53,7 @@ const Header = () => {
                             <Link to='/home'>Home</Link>
                             <Link to='/catalog'>Catalog</Link>
                             <Link to='/news'>News</Link>
-                            <Link to='/collections'>Collections</Link>
+                            <Link to='/queues'>Queues</Link>
                         </Navlinks>
                         <FaBars
                             className='md:hidden'

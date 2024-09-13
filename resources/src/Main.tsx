@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Anime, Home, News, Collections, Terms, Watch } from './components';
+import { Anime, Home, News, Queues, Terms, Watch } from './components';
 
 const Main = () => {
     return (
@@ -9,7 +9,7 @@ const Main = () => {
             <Route path='/home' element={<Home />} />
             <Route path='/catalog' />
             <Route path='/news' element={<News />} />
-            <Route path='/collections' element={<Collections />} />
+            <Route path='/queues' element={<Queues />} />
             <Route path='/anime/:id' element={<Anime />} />
             <Route path='/terms' element={<Terms />} />
             <Route path='/watch/:id/episode/:episodeId' element={<Watch />} />

@@ -21,6 +21,20 @@ main {
     flex: 1;
 }
 
+h1,
+h2,
+h3,
+h4,
+a,
+p {
+    color: white;
+}
+
+h1 {
+    font-size: large;
+    font-weight: 600;
+}
+
 video {
     height: 100%;
 }
