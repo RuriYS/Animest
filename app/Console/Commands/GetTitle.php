@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\ProcessTitle;
 use Illuminate\Console\Command;
 
 class GetTitle extends Command
@@ -26,7 +27,7 @@ class GetTitle extends Command
     public function handle()
     {
         $id = $this->argument('id');
-        \App\Jobs\ProcessTitle::dispatch($id);
-        $this->info("Dispatched job with ID: $id");
+        ProcessTitle::dispatch($id);
+        $this->info("Dispatched job with Title ID: $id");
     }
 }

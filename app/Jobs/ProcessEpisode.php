@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Title;
 use App\Models\Episode;
 use App\Spiders\VidstreamVideoSpider;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -13,9 +14,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use RoachPHP\Roach;
 
-class ProcessEpisodes implements ShouldQueue
+class ProcessEpisode implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $id;
 
@@ -26,8 +27,6 @@ class ProcessEpisodes implements ShouldQueue
 
     public function handle()
     {
-        Log::debug("Processing episode with ID: $this->id");
-
         $items = Roach::collectSpider(
             VidstreamVideoSpider::class,
             context: ['id' => $this->id]

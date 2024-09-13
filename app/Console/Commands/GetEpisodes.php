@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\ProcessEpisodes;
+use App\Jobs\ProcessEpisode;
 use Illuminate\Console\Command;
 
 class GetEpisodes extends Command
@@ -35,7 +35,7 @@ class GetEpisodes extends Command
 
             $episodeId = "{$id}-episode-{$i}";
 
-            ProcessEpisodes::dispatch($episodeId);
+            ProcessEpisode::dispatch($episodeId);
 
             $this->info("Dispatched job for {$episodeId}");
         }
