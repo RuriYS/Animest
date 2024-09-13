@@ -2,16 +2,16 @@
 
 namespace App\Processors;
 
-use Log;
 use RoachPHP\ItemPipeline\ItemInterface;
 use RoachPHP\ItemPipeline\Processors\ItemProcessorInterface;
 use RoachPHP\Support\Configurable;
 
-class VidstreamItemProcessor implements ItemProcessorInterface
+class VidstreamProcessor implements ItemProcessorInterface
 {
     use Configurable;
 
-    public function processItem(ItemInterface $item): ItemInterface {
+    public function processItem(ItemInterface $item): ItemInterface
+    {
         $streamData = $item->get('stream_data');
 
         if ($streamData) {

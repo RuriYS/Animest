@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class Episode extends Model
@@ -13,19 +12,24 @@ class Episode extends Model
 
     protected $fillable = [
         'id',
+        'download_url',
         'episode_index',
         'title_id',
         'upload_date',
         'video',
-        'views',
     ];
 
     protected $casts = [
         'id' => 'string',
+        'download_url' => 'string',
         'episode_index' => 'string',
         'title_id' => 'string',
         'upload_date' => 'string',
         'video' => 'array',
-        'views' => 'integer'
     ];
+
+    public function title()
+    {
+        return $this->belongsTo(Title::class);
+    }
 }

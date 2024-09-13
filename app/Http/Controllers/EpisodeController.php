@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\GetVideo;
+use App\Jobs\ProcessEpisodes;
 use App\Models\Episode;
 
 class EpisodeController extends Controller
@@ -49,7 +49,7 @@ class EpisodeController extends Controller
 
     public function get(string $id)
     {
-        GetVideo::dispatch($id);
+        ProcessEpisodes::dispatch($id);
         return response()->noContent(200);
     }
 }

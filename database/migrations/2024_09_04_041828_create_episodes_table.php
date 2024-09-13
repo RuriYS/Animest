@@ -9,11 +9,13 @@ return new class extends Migration {
     {
         Schema::create('episodes', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->string('title_id')->nullable();
+            $table->string('title_id');
+            $table->string('download_url')->nullable();
             $table->string('episode_index')->nullable();
             $table->string('upload_date')->nullable();
             $table->json('video')->nullable();
-            $table->integer('views')->nullable();
+
+            $table->foreign('title_id')->references('id')->on('titles')->onDelete('cascade');
         });
     }
 

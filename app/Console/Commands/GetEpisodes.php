@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\GetVideo;
+use App\Jobs\ProcessEpisodes;
 use Illuminate\Console\Command;
 
 class GetEpisodes extends Command
@@ -12,14 +12,14 @@ class GetEpisodes extends Command
      *
      * @var string
      */
-    protected $signature = 'scraper:videos {id} {start} {end?}';
+    protected $signature = 'scraper:episodes {id} {start} {end?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Get the Episodes for a Title';
 
     /**
      * Execute the console command.
@@ -35,7 +35,7 @@ class GetEpisodes extends Command
 
             $episodeId = "{$id}-episode-{$i}";
 
-            GetVideo::dispatch($episodeId);
+            ProcessEpisodes::dispatch($episodeId);
 
             $this->info("Dispatched job for {$episodeId}");
         }

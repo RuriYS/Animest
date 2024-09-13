@@ -2,23 +2,17 @@
 
 namespace App\Spiders;
 
-use App\Processors\VidstreamItemProcessor;
+use App\Processors\VidstreamProcessor;
 use App\Utils\Ajax;
 use App\Utils\Dateparser;
 use Generator;
-use Log;
+use Illuminate\Support\Facades\Log;
 use RoachPHP\Downloader\Middleware\UserAgentMiddleware;
 use RoachPHP\Http\Request;
 use RoachPHP\Http\Response;
 use RoachPHP\Spider\BasicSpider;
 use Symfony\Component\DomCrawler\Crawler;
 
-/**
- * --------------------------------------------------------------------------
- * Vidstream Spider
- * --------------------------------------------------------------------------
- *
- */
 class VidstreamVideoSpider extends BasicSpider
 {
     protected function initialRequests(): array
@@ -44,7 +38,7 @@ class VidstreamVideoSpider extends BasicSpider
     ];
 
     public array $itemProcessors = [
-        VidstreamItemProcessor::class,
+        VidstreamProcessor::class,
     ];
 
     public array $extensions = [];
@@ -56,27 +50,31 @@ class VidstreamVideoSpider extends BasicSpider
         $iframe = $response->filter('.play-video iframe[src]');
 
         if ($iframe->count() === 1) {
-            Log::debug("Parsing {$this->context['id']}");
-
-            // Anime Details
+            // Details
             yield $this->item([
                 'title' => $response->filter('.video-details .date')->innerText(true),
                 'description' => $response->filter('.video-details #rmjs-1')->innerText(true),
+                'episode_id' => $this->context['id']
             ]);
 
             // Related Episodes
-            yield $this->item(
-                $response->filter('.listing.lists li')->each(
-                    fn(Crawler $node) => [
-                        'episode_id' => explode('/videos/', urldecode($node->filter('a')->first()->attr('href')))[1],
-                        'title' => urldecode($node->filter('.name')->text()),
-                        'date_added' => $dateparser->parseDate($node->filter('.meta .date')->text()),
-                        'splash' => $node->filter('.img .picture img')->attr('src'),
-                    ]
-                )
-            );
+            yield $this->item([
+                'episodes' =>
+                    $response->filter('.listing.lists li')->each(
+                        fn(Crawler $node) => [
+                            'episode_id' => explode('/videos/', urldecode($node->filter('a')->first()->attr('href')))[1],
+                            'title' => urldecode($node->filter('.name')->text()),
+                            'date_added' => $dateparser->parseDate($node->filter('.meta .date')->text()),
+                            'splash' => $node->filter('.img .picture img')->attr('src'),
+                        ]
+                    )
+            ]);
 
             yield $this->request('GET', $iframe->attr('src'), 'parseIframe');
+        } else {
+            yield $this->item([
+                'error' => 'Episode not found.'
+            ]);
         }
     }
 
@@ -90,17 +88,13 @@ class VidstreamVideoSpider extends BasicSpider
         $token = $response->filter('script[data-name="episode"]')->attr('data-value');
         $token = $ajax->decryptToken($token);
         $video_id = $response->filter('#id')->attr('value');
-        $url = $response->getUri();
-        parse_str(parse_url($url, PHP_URL_QUERY), $query);
-        $episode_id = preg_replace('/[^a-z\s\d]/', '', strtolower(urldecode($query['title'])));
 
         // Video data
         yield $this->item([
             'title' => urldecode(str_replace('+', ' ', $response->filter('#title')->attr('value'))),
-            'episode_id' => str_replace(' ', '-', $episode_id),
             'video_id' => $response->filter('#id')->attr('value'),
             'type' => $response->filter('#typesub')->attr('value'),
-            'download_uri' => "https://s3taku.com/download?id=$token",
+            'download_url' => "https://s3taku.com/download?id=$token",
         ]);
 
         $params = $ajax->generateAjaxParams(
@@ -117,7 +111,6 @@ class VidstreamVideoSpider extends BasicSpider
 
     public function parseVideoData(Response $response)
     {
-        // Log::debug("Parsing videodata");
         $ajax = new Ajax(
             config('app.decryption_key'),
             config('app.iv_key'),

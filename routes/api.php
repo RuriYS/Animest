@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AnimeController;
+use App\Http\Controllers\TitleController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EpisodeController;
 use Illuminate\Support\Facades\Route;
@@ -20,8 +20,8 @@ Route::prefix('/videos')
         Route::post('/{anime_id}/{index}', [EpisodeController::class, 'view']);
     });
 
-Route::prefix('/animes')
+Route::prefix('/titles')
     ->group(function () {
-        Route::get('/', [AnimeController::class, 'index']);
-        Route::get('/{id}', [AnimeController::class, 'show']);
+        Route::get('/', [TitleController::class, 'index']);
+        Route::get('/{id}', [TitleController::class, 'show']);
     });
