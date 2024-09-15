@@ -18,10 +18,12 @@ Route::prefix('/videos')
         Route::get('/{anime_id}', [EpisodeController::class, 'index']);
         Route::get('/{anime_id}/{index}', [EpisodeController::class, 'show']);
         Route::post('/{anime_id}/{index}', [EpisodeController::class, 'view']);
+        Route::get('/{anime_id}/{index}/process', [EpisodeController::class, 'process']);
     });
 
 Route::prefix('/titles')
     ->group(function () {
         Route::get('/', [TitleController::class, 'index']);
         Route::get('/{id}', [TitleController::class, 'show']);
+        Route::get('/{id}/process', [TitleController::class, 'process']);
     });

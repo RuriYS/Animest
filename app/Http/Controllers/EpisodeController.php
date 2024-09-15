@@ -46,9 +46,13 @@ class EpisodeController extends Controller
         return response($episode->views, 200);
     }
 
-    public function get(string $id)
+    public function process(string $anime_id, string $index)
     {
+        $id = "$anime_id-episode-$index";
         ProcessEpisode::dispatch($id);
-        return response()->noContent(200);
+        return response()->json([
+            'query' => $id,
+            'message' => 'Job dispatched'
+        ]);
     }
 }

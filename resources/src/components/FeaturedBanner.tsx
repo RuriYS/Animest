@@ -49,7 +49,7 @@ const FeaturedBanner = () => {
             )}
             <div
                 className={
-                    'absolute z-10 h-full content-center bottom-0 left-0 w-full text-white bg-gradient-to-b from-transparent to-black'
+                    'absolute z-10 h-full content-center -bottom-1 left-0 w-full text-white bg-gradient-to-b from-transparent to-black'
                 }
             >
                 <Constraint>

@@ -60,7 +60,7 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
         $titleExists = Title::where('id', $titleId)->exists();
 
         if (!$titleExists) {
-            Log::debug("Attempting to create a Title for the episode with title_id: $titleId");
+            Log::info("Attempting to create a Title for the episode with title_id: $titleId");
             ProcessTitle::dispatchSync($titleId);
         }
 
@@ -73,5 +73,7 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
             'upload_date' => $meta['date_added'],
             'video' => $results['stream_data'],
         ]);
+
+        Log::info("Episode job finished");
     }
 }

@@ -33,4 +33,12 @@ class TitleController extends Controller
             'result' => $title?->toArray()
         ]);
     }
+
+    public function process(string $id)
+    {
+        ProcessTitle::dispatchSync($id);
+        return response()->json([
+            'message' => 'Job dispatched'
+        ]);
+    }
 }

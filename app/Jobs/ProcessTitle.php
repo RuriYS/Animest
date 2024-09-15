@@ -43,7 +43,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
 
         $items = Roach::collectSpider(
             GogoSpider::class,
-            context: ['id' => $this->id]
+            context: ['uri' => "/category/$this->id"]
         );
 
         $result = array_merge(
