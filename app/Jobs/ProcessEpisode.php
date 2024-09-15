@@ -6,6 +6,7 @@ use App\Models\Title;
 use App\Models\Episode;
 use App\Spiders\VidstreamVideoSpider;
 use Illuminate\Bus\Batchable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -14,15 +15,22 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use RoachPHP\Roach;
 
-class ProcessEpisode implements ShouldQueue
+class ProcessEpisode implements ShouldQueue, ShouldBeUnique
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $id;
 
+    public $uniqueFor = 3600;
+
     public function __construct(string $id)
     {
         $this->id = $id;
+    }
+
+    public function uniqueId(): string
+    {
+        return $this->id;
     }
 
     public function handle()

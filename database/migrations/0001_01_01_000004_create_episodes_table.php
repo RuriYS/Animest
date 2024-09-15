@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('upload_date')->nullable();
             $table->json('video')->nullable();
 
-            $table->foreign('title_id')->references('id')->on('titles')->onDelete('cascade');
+            $table->foreign('title_id')->references('id')->on('titles');
         });
     }
 

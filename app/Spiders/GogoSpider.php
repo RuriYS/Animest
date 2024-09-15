@@ -37,7 +37,7 @@ class GogoSpider extends BasicSpider
         if ($response->getStatus() === 200) {
             yield $this->item([
                 'description' => $response->filter('.anime_info_body_bg .description')->text(),
-                'length' => intval($response->filter('#episode_page a')->attr('ep_end')),
+                'length' => intval($response->filter('#episode_page a')->last()->attr('ep_end')),
                 'genres' => $response->filter('.anime_info_body_bg p.type:nth-child(7) a')->each(fn(Crawler $node) => trim(preg_replace('/[,]/', '', $node->text()))),
                 'id' => $this->context['id'],
                 'language' => str_ends_with($this->context['id'], '-dub') ? 'dub' : 'sub',

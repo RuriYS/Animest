@@ -42,7 +42,6 @@ class EpisodeController extends Controller
         ];
 
         $episode = Episode::find($episodeIdFormats[0]) ?? Episode::find($episodeIdFormats[1]);
-        $episode->views += 1;
         $episode->save();
         return response($episode->views, 200);
     }

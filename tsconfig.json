@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "baseUrl": "./resources",
         "moduleResolution": "node",
         "target": "es5",
         "module": "esnext",
@@ -9,6 +10,9 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "noImplicitAny": true,
+        "paths": {
+            "@/*": [ "./src/*" ]
+        }
     },
     "include": [ "resources/src", "resources/types" ]
 }

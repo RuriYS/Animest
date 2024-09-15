@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->string('title')->nullable();
             $table->string('language')->nullable();
             $table->string('length')->nullable();
-            $table->string('description')->nullable();
+            $table->text('description')->charset('binary')->nullable();
             $table->string('names')->nullable();
             $table->string('origin')->nullable();
             $table->string('season')->nullable();

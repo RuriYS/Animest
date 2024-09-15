@@ -2,11 +2,13 @@
 
 namespace App\Jobs;
 
+use App\Models\Episode;
 use App\Models\Genre;
 use App\Models\Title;
 use App\Spiders\GogoSpider;
 use Bus;
 use Illuminate\Bus\Batch;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -15,15 +17,22 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use RoachPHP\Roach;
 
-class ProcessTitle implements ShouldQueue
+class ProcessTitle implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $id;
 
+    public $uniqueFor = 3600;
+
     public function __construct(string $id)
     {
         $this->id = $id;
+    }
+
+    public function uniqueId(): string
+    {
+        return $this->id;
     }
 
     public function handle(): void
@@ -75,21 +84,36 @@ class ProcessTitle implements ShouldQueue
         }
 
         $length = $result['length'];
-        Log::info("Processing $length episodes");
+
+        $existingEpisodes = Episode::where('title_id', $this->id)
+            ->select('episode_index')
+            ->pluck('episode_index')
+            ->toArray();
 
         $jobs = [];
+
         for ($i = 1; $i <= $length; $i++) {
-            $episodeId = "{$this->id}-episode-{$i}";
-            $jobs[] = new ProcessEpisode($episodeId);
+            if (!in_array($i, $existingEpisodes)) {
+                $episodeId = "{$this->id}-episode-{$i}";
+                $jobs[] = new ProcessEpisode($episodeId);
+            }
         }
 
-        Bus::batch($jobs)
-            ->progress(function (Batch $batch) {
-                Log::info('Progress: ' . $batch->progress() . '/100');
-            })
-            ->then(function (Batch $batch) use ($length, $id) {
-                Log::info("Successfully processed $length episodes (ID: $id)");
-            })
-            ->dispatch();
+        $job_len = count($jobs);
+
+        Log::info("Processing $job_len episodes.");
+
+        if (!empty($jobs)) {
+            Bus::batch($jobs)
+                ->progress(function (Batch $batch) use ($job_len, $id) {
+                    Log::info('Processed ' . $batch->processedJobs() . " out of $job_len episodes. (Title ID: $id)");
+                })
+                ->then(function (Batch $batch) use ($length, $id) {
+                    Log::info("Successfully processed $length episodes (ID: $id)");
+                })
+                ->dispatch();
+        }
+
+        Log::info("Title successfully processed (ID: $id)");
     }
 }

@@ -4,7 +4,7 @@ import tw from 'twin.macro';
 import styled from '@emotion/styled';
 import MorphableSearchBar from '../elements/MorphableSearchBar';
 import { FaBars } from 'react-icons/fa';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { CSSTransition } from 'react-transition-group';
 
 const HeaderContainer = styled.div`
     ${tw`fixed h-12 w-full z-20 bg-gradient-to-b from-black to-transparent`}
@@ -23,7 +23,7 @@ const Navlinks = styled.div`
 `;
 
 const LeftNav = styled.div`
-    ${tw`flex justify-between gap-x-4`}
+    ${tw`flex justify-between gap-x-8`}
 `;
 
 const RightNav = styled.div`
@@ -31,8 +31,12 @@ const RightNav = styled.div`
 `;
 
 const MobileNav = styled.div`
-    ${tw`flex flex-col md:hidden p-4 rounded-lg h-full`}
+    ${tw`flex flex-col space-y-4 absolute inset-0 h-[250px] -z-10 p-4 pt-[60px] md:hidden rounded-lg`}
     background-color: rgba(0, 0, 0, 80%)
+`;
+
+const LINK = styled(Link)`
+    ${tw`text-gray-200 hover:text-white transition-all duration-300 ease-in-out`}
 `;
 
 const Header = () => {
@@ -49,11 +53,11 @@ const Header = () => {
                                 Animest
                             </h1>
                         </Link>
-                        <Navlinks className='hidden md:flex'>
-                            <Link to='/home'>Home</Link>
-                            <Link to='/catalog'>Catalog</Link>
-                            <Link to='/news'>News</Link>
-                            <Link to='/queues'>Queues</Link>
+                        <Navlinks className='hidden md:flex text-gray-500 hover:text-white'>
+                            <LINK to='/home'>Home</LINK>
+                            <LINK to='/catalog'>Catalog</LINK>
+                            <LINK to='/news'>News</LINK>
+                            <LINK to='/queues'>Queues</LINK>
                         </Navlinks>
                         <FaBars
                             className='md:hidden'
@@ -69,11 +73,11 @@ const Header = () => {
                         nodeRef={nodeRef}
                     >
                         <MobileNav ref={nodeRef}>
-                            <Navlinks>
-                                <Link to='/home'>Home</Link>
-                                <Link to='/catalog'>Catalog</Link>
-                                <Link to='/news'>News</Link>
-                                <Link to='/collections'>Collections</Link>
+                            <Navlinks className='text-gray-500 hover:text-white'>
+                                <LINK to='/home'>Home</LINK>
+                                <LINK to='/catalog'>Catalog</LINK>
+                                <LINK to='/news'>News</LINK>
+                                <LINK to='/collections'>Collections</LINK>
                             </Navlinks>
                             <MorphableSearchBar />
                         </MobileNav>

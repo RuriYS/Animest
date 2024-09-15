@@ -3,9 +3,9 @@ import styled from '@emotion/styled';
 
 const Button = styled.button(
     ({ variant }: { variant: 'primary' | 'secondary' }) => [
-        tw`h-full px-4 py-2 truncate text-xs font-medium rounded-lg flex items-center justify-center space-x-2`,
-        variant == 'primary' && tw`bg-gray-800 text-white`,
-        variant == 'secondary' && tw`bg-white text-black`,
+        tw`h-full min-w-20 px-4 py-2 truncate text-sm font-medium rounded-lg flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed`,
+        variant == 'primary' && tw`bg-neutral-800 text-white`,
+        variant == 'secondary' && tw`bg-neutral-300 text-black`,
     ],
 );
 
