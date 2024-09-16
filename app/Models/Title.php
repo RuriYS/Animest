@@ -15,6 +15,7 @@ class Title extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
+        'alias',
         'description',
         'id',
         'language',
@@ -29,6 +30,7 @@ class Title extends Model
     ];
 
     protected $casts = [
+        'alias' => 'string',
         'description' => 'string',
         'id' => 'string',
         'language' => 'string',

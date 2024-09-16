@@ -6,10 +6,10 @@ use App\Models\Title;
 use App\Models\Episode;
 use App\Spiders\VidstreamVideoSpider;
 use Illuminate\Bus\Batchable;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
@@ -19,8 +19,7 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
 {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $id;
-
+    protected string $id;
     public $uniqueFor = 3600;
 
     public function __construct(string $id)
@@ -35,45 +34,85 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
 
     public function handle()
     {
-        $items = Roach::collectSpider(
-            VidstreamVideoSpider::class,
-            context: ['id' => $this->id]
-        );
+        Log::info("Starting to process Episode", ['id' => $this->id]);
 
+        try {
+            $results = $this->collectSpiderResults();
+
+            if (isset($results['error'])) {
+                Log::warning("Episode Job discarded", ['id' => $this->id, 'reason' => $results['error']]);
+                return;
+            }
+
+            $episodeData = $this->processResults($results);
+            $this->ensureTitleExists($episodeData['title_id']);
+            $this->createOrUpdateEpisode($episodeData);
+
+            Log::info("Episode successfully processed", ['id' => $this->id]);
+        } catch (\Exception $e) {
+            Log::error("Error processing Episode", ['id' => $this->id, 'error' => $e->getMessage()]);
+        }
+    }
+
+    private function collectSpiderResults(): array
+    {
+        Log::debug("Collecting spider results", ['id' => $this->id]);
+        $items = Roach::collectSpider(VidstreamVideoSpider::class, context: ['id' => $this->id]);
         $results = array_merge(...array_map(fn($item) => $item->all(), $items));
+        Log::debug("Spider results collected", ['id' => $this->id, 'resultCount' => count($results)]);
+        return $results;
+    }
 
-        if (isset($results['error'])) {
-            Log::warning("Episode Job with ID: '$this->id' has been discarded with reason: {$results['error']}");
-            return;
+    private function processResults(array $results): array
+    {
+        Log::debug("Processing spider results", ['id' => $this->id]);
+
+        $episodeId = trim($results['episode_id'] ?? '');
+        $titleId = explode('-episode', $episodeId)[0] ?? null;
+
+        $episodes = $results['episodes'] ?? [];
+        $meta = $this->findEpisodeMeta($episodes, $episodeId);
+
+        if (!$episodeId || !$titleId) {
+            throw new \Exception("Invalid episode or title ID");
         }
 
-        $episodes = $results['episodes'] ?? null;
+        Log::debug("Results processed", ['episodeId' => $episodeId, 'titleId' => $titleId]);
 
-        $episode_id = trim($results['episode_id']) ?? null;
-        $titleId = explode('-episode', $episode_id)[0] ?? null;
-        $meta = array_values(array_filter($episodes, function ($item) use ($episode_id) {
-            return $item['episode_id'] == $episode_id;
+        return [
+            'id' => $episodeId,
+            'episode_index' => explode('episode-', $episodeId)[1] ?? null,
+            'download_url' => $results['download_url'] ?? null,
+            'title_id' => $titleId,
+            'upload_date' => $meta['date_added'] ?? null,
+            'video' => $results['stream_data'] ?? null,
+        ];
+    }
+
+    private function findEpisodeMeta(array $episodes, string $episodeId): ?array
+    {
+        $filtered = array_values(array_filter($episodes, function ($item) use ($episodeId) {
+            return $item['episode_id'] == $episodeId;
         }));
+        return $filtered ? $filtered[0] : null;
+    }
 
-        $meta = $meta ? $meta[0] : null;
-
-        $titleExists = Title::where('id', $titleId)->exists();
-
-        if (!$titleExists) {
-            Log::info("Attempting to create a Title for the episode with title_id: $titleId");
+    private function ensureTitleExists(string $titleId): void
+    {
+        Log::debug("Checking if Title exists", ['titleId' => $titleId]);
+        if (!Title::where('id', $titleId)->exists()) {
+            Log::info("Title not found, creating new Title", ['titleId' => $titleId]);
             ProcessTitle::dispatchSync($titleId);
         }
+    }
 
-        Episode::updateOrCreate([
-            'id' => $episode_id
-        ], [
-            'episode_index' => explode('episode-', $episode_id)[1],
-            'download_url' => $results['download_url'],
-            'title_id' => $titleId,
-            'upload_date' => $meta['date_added'],
-            'video' => $results['stream_data'],
-        ]);
-
-        Log::info("Episode job finished");
+    private function createOrUpdateEpisode(array $episodeData): void
+    {
+        Log::debug("Creating or updating Episode", ['id' => $episodeData['id']]);
+        $episode = Episode::updateOrCreate(
+            ['id' => $episodeData['id']],
+            $episodeData
+        );
+        Log::debug("Episode created or updated", ['id' => $episode->id]);
     }
 }

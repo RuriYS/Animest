@@ -21,7 +21,6 @@ class TitleController extends Controller
         }
 
         return response()->json([
-            'endpoint' => 'titles',
             'errors' => $title ? null : 'Not found',
             'query' => $id,
             'result' => $title?->toArray()

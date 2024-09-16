@@ -8,6 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('titles', function (Blueprint $table) {
+            $table->string('alias')->nullable();
             $table->string('id')->primary();
             $table->string('title')->nullable();
             $table->string('language')->nullable();

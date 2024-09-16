@@ -3,7 +3,7 @@
 namespace App\Spiders;
 
 use App\Processors\GogoProcessor;
-use App\Utils\AnimeParser;
+use App\Utils\CateParser;
 use Generator;
 use Illuminate\Support\Facades\Log;
 use RoachPHP\Downloader\Middleware\UserAgentMiddleware;
@@ -38,6 +38,8 @@ class GogoSpider extends BasicSpider
     ];
     public function parse(Response $response): Generator
     {
+        file_put_contents(public_path('gogo_content.html'), $response->html());
+
         $path = (string) parse_url($response->getUri(), PHP_URL_PATH);
         $paths = explode("/", $path);
 
@@ -45,6 +47,23 @@ class GogoSpider extends BasicSpider
             switch ($paths[1]) {
                 case 'category':
                     $id = $paths[2];
+
+                    $paginationId = $response->filter('input#movie_id')->attr('value');
+                    $paginationAlias = $response->filter('input#alias_anime')->attr('value');
+                    $paginationDefaultIndex = $response->filter('input#default_ep')->attr('value');
+                    $paginationNode = $response->filter('#episode_page > li:nth-child(1) > a');
+                    $paginationStart = $paginationNode->attr('ep_start');
+                    $paginationEnd = $paginationNode->attr('ep_end');
+                    $params = http_build_query([
+                        'ep_start' => $paginationStart,
+                        'ep_end' => $paginationEnd,
+                        'id' => $paginationId,
+                        'default_ep' => $paginationDefaultIndex,
+                        'alias' => $paginationAlias
+                    ]);
+
+                    yield $this->request('GET', "https://ajax.gogocdn.net/ajax/load-list-episode?$params", 'parseEpisodeList');
+
                     yield $this->item([
                         'description' => $response->filter('.anime_info_body_bg .description')->text(),
                         'length' => intval($response->filter('#episode_page a')->last()->attr('ep_end')),
@@ -53,7 +72,7 @@ class GogoSpider extends BasicSpider
                         'language' => str_ends_with($id, '-dub') ? 'dub' : 'sub',
                         'names' => $response->filter('.anime_info_body_bg p.type:nth-child(10) a')->text(),
                         'origin' => null,
-                        'season' => AnimeParser::parseSeason($response->filter('.anime_info_body_bg p.type:nth-child(4) a')->attr('href')),
+                        'season' => CateParser::parseSeason($response->filter('.anime_info_body_bg p.type:nth-child(4) a')->attr('href')),
                         'splash' => $response->filter('.anime_info_body_bg img')->attr('src'),
                         'status' => $response->filter('.anime_info_body_bg p.type:nth-child(9) a')->text(),
                         'title' => $response->filter('.anime_info_body_bg h1')->text(),
@@ -88,7 +107,21 @@ class GogoSpider extends BasicSpider
                 'error' => "Title not found."
             ]);
         }
+    }
 
-        // file_put_contents(public_path('gogo_content.html'), $response->html());
+    public function parseEpisodeList(Response $response): Generator
+    {
+        file_put_contents(public_path('episode_list.html'), $response->html());
+
+        $href = $response->filter('#episode_related a')->attr('href');
+
+        if (preg_match('/\/([^\/]+)-episode-\d+$/', $href, $matches)) {
+            $alias = $matches[1];
+            yield $this->item([
+                'alias' => $alias,
+            ]);
+        } else {
+            Log::warning("Could not extract alias ID: " . $href);
+        }
     }
 }

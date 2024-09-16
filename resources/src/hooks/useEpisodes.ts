@@ -57,8 +57,8 @@ export default function useEpisodesAndMeta(id: string) {
     useInterval(fetchMeta, metaPolling ? 5000 : null);
 
     useEffect(() => {
-        fetchEpisodes();
         fetchMeta();
+        fetchEpisodes();
     }, [fetchEpisodes, fetchMeta]);
 
     return { loading, episodes, meta, error };
