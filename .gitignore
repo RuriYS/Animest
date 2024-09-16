@@ -5,6 +5,7 @@ bootstrap/cache
 public/build
 public/hot
 public/mix-manifest.json
+public/*.html
 .vscode/
 
 package-lock.json
