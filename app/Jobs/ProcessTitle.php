@@ -39,7 +39,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
     {
         $id = str($this->id);
 
-        Log::debug("Processing Title with ID: $this->id");
+        Log::info("Processing Title with ID: $this->id");
 
         $items = Roach::collectSpider(
             GogoSpider::class,
@@ -75,9 +75,8 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
 
         if (!empty($genreIDs)) {
             try {
-                $title->genres()->sync($genreIDs);
             } catch (\Exception $e) {
-                Log::error("Error syncing genres for title {$title->id}: " . $e->getMessage());
+                Log::error("Error syncing genres for title " . $title->id . ': ' . $e->getMessage());
             }
         } else {
             Log::warning("No valid genres found for title: {$title->id}");

@@ -14,6 +14,8 @@ class Genre extends Model
 
     public $timestamps = false;
 
+    protected $primaryKey = 'id';
+
     public function titles(): BelongsToMany
     {
         return $this->belongsToMany(

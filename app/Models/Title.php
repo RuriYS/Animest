@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Title extends Model
 {
+    public $incrementing = false;
+
     protected $table = 'titles';
     protected $primaryKey = 'id';
     protected $keyType = 'string';
@@ -24,6 +26,20 @@ class Title extends Model
         'status',
         'title',
         'year',
+    ];
+
+    protected $casts = [
+        'description' => 'string',
+        'id' => 'string',
+        'language' => 'string',
+        'length' => 'integer',
+        'names' => 'string',
+        'origin' => 'string',
+        'season' => 'string',
+        'splash' => 'string',
+        'status' => 'string',
+        'title' => 'string',
+        'year' => 'string',
     ];
 
     public function episodes(): HasMany
