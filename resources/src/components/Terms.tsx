@@ -23,7 +23,7 @@ const SectionTitle = styled.h2`
 `;
 
 const Paragraph = styled.p`
-    ${tw`mb-4 leading-relaxed`}
+    ${tw`mb-4 leading-relaxed text-sm text-neutral-300`}
 `;
 
 const Link = styled.a<LinkProps>`
@@ -36,7 +36,7 @@ const Terms = () => {
             <Title>Terms and Conditions</Title>
 
             <Section>
-                <SectionTitle>1. Introduction</SectionTitle>
+                <SectionTitle>Introduction</SectionTitle>
                 <Paragraph>
                     Welcome to Animest ("we", "our", or "us"). These Terms and
                     Conditions ("Terms") govern your use of our website and
@@ -46,19 +46,19 @@ const Terms = () => {
             </Section>
 
             <Section>
-                <SectionTitle>2. Content Disclaimer</SectionTitle>
+                <SectionTitle>Disclaimer</SectionTitle>
                 <Paragraph>
-                    Animest is an anime streaming platform that does not host
-                    any content directly. We do not own or control the content
-                    available through our website. All anime content provided
-                    through our site is hosted on third-party servers and is the
-                    property of the respective copyright holders. We do not
-                    claim any rights to this content.
+                    Animest is a free anime streaming platform. We do not host,
+                    own or control the content available through our website.
+                    All anime content provided through our site is hosted on
+                    third-party servers and is the property of the respective
+                    copyright holders. We do not claim any rights to this
+                    content.
                 </Paragraph>
             </Section>
 
             <Section>
-                <SectionTitle>3. Copyright Notice</SectionTitle>
+                <SectionTitle>Copyright Notice</SectionTitle>
                 <Paragraph>
                     All content, trademarks, and other intellectual property
                     rights related to the anime and media featured on Animest
@@ -69,7 +69,7 @@ const Terms = () => {
 
             <Section>
                 <SectionTitle>
-                    4. No Responsibility for Third-Party Content
+                    No Responsibility for Third-Party Content
                 </SectionTitle>
                 <Paragraph>
                     We are not responsible for the availability, legality, or
@@ -81,7 +81,7 @@ const Terms = () => {
             </Section>
 
             <Section>
-                <SectionTitle>5. Limitation of Liability</SectionTitle>
+                <SectionTitle>Limitation of Liability</SectionTitle>
                 <Paragraph>
                     Animest provides its services on an "as is" and "as
                     available" basis. We disclaim all warranties and
@@ -93,7 +93,7 @@ const Terms = () => {
             </Section>
 
             <Section>
-                <SectionTitle>6. User Conduct</SectionTitle>
+                <SectionTitle>User Conduct</SectionTitle>
                 <Paragraph>
                     You agree to use Animest in compliance with all applicable
                     laws and regulations. You must not use the website for any
@@ -104,7 +104,7 @@ const Terms = () => {
             </Section>
 
             <Section>
-                <SectionTitle>7. Changes to Terms</SectionTitle>
+                <SectionTitle>Changes to Terms</SectionTitle>
                 <Paragraph>
                     We reserve the right to modify these Terms at any time. Any
                     changes will be posted on this page with an updated revision
@@ -114,7 +114,7 @@ const Terms = () => {
             </Section>
 
             <Section>
-                <SectionTitle>8. Contact Us</SectionTitle>
+                <SectionTitle>Contact Us</SectionTitle>
                 <Paragraph>
                     If you have any questions about these Terms, please contact
                     us at
@@ -125,7 +125,9 @@ const Terms = () => {
                 </Paragraph>
             </Section>
 
-            <Paragraph>Last Updated: 5th of September 06:30 UTC</Paragraph>
+            <Paragraph className='text-xs text-neutral-500'>
+                Last Updated: 5th of September 06:30 UTC
+            </Paragraph>
         </TermsContainer>
     );
 };

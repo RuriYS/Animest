@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('splash')->nullable();
             $table->string('status')->nullable();
             $table->year('year')->nullable();
+            $table->timestamps();
         });
     }
 

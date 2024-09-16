@@ -18,7 +18,7 @@ const EpisodeInfo: React.FC<EpisodeInfoProps> = ({
             <h1 className='text-2xl font-semibold'>{meta.title}</h1>
             <h2 className='font-semibold'>
                 Episode {episode?.episode_index}
-                {meta.language === 'sub' ? ' (Subbed)' : ' (Dubbed)'}
+                {meta.language && ` (${meta.language[0].toUpperCase()}ubbed)`}
             </h2>
         </div>
         <div className='flex-1 flex-col lg:flex gap-4 p-4 bg-neutral-900 rounded-lg'>

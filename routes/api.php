@@ -23,7 +23,7 @@ Route::prefix('/videos')
 
 Route::prefix('/titles')
     ->group(function () {
-        Route::get('/', [TitleController::class, 'index']);
+        Route::get('/', [TitleController::class, 'search']);
         Route::get('/{id}', [TitleController::class, 'show']);
         Route::get('/{id}/process', [TitleController::class, 'process']);
     });

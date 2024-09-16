@@ -1,9 +1,11 @@
 import styled from '@emotion/styled';
 import tw from 'twin.macro';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { debounce } from 'lodash';
 
 const SearchBarWrapper = styled.div`
     ${tw`relative`}
@@ -30,7 +32,7 @@ const SearchBar = styled.input<{ isExpanded: boolean }>`
     }
 
     @media (min-width: 768px) {
-        width: ${({ isExpanded }) => (isExpanded ? '12rem' : '40px')};
+        width: ${({ isExpanded }) => (isExpanded ? '20rem' : '40px')};
     }
 `;
 
@@ -45,12 +47,17 @@ const Dropdown = styled.ul<{ isExpanded: boolean }>`
     }
 `;
 
+interface Result {
+    id: string;
+    title: string;
+}
+
 const MorphableSearchBar = () => {
     let mt: NodeJS.Timeout;
     const [isExpanded, setExpanded] = useState(false);
     const [isFocused, setFocus] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<Result[]>([]);
 
     const handleBlur = () => {
         setTimeout(() => {
@@ -70,20 +77,28 @@ const MorphableSearchBar = () => {
         }, 800);
     };
 
+    const fetchResults = useCallback(
+        debounce(async (value: string) => {
+            try {
+                const response = await axios.get(
+                    `/api/titles?q=${encodeURIComponent(value)}&limit=20`,
+                );
+                setSearchResults(response.data.results);
+            } catch (error) {
+                console.error('Error fetching search results:', error);
+                setSearchResults([]);
+            }
+        }, 300),
+        [],
+    );
+
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log(searchResults);
         const value = e.target.value;
         setSearchTerm(value);
 
-        if (value) {
-            const mockResults = [
-                {
-                    title: 'My Deer Friend Nokotan',
-                    url: 'shikanoko-nokonoko-koshitantan',
-                },
-            ].filter((result) =>
-                result.title.toLowerCase().includes(value.toLowerCase()),
-            );
-            setSearchResults(mockResults);
+        if (value && value.length > 0) {
+            fetchResults(value);
         } else {
             setSearchResults([]);
         }
@@ -104,15 +119,21 @@ const MorphableSearchBar = () => {
                 onChange={handleSearch}
                 value={searchTerm}
             />
-            {searchResults.length > 0 && (
+            {searchResults && (
                 <Dropdown isExpanded={isExpanded}>
-                    {searchResults.map((result, index) => (
-                        <li key={index}>
-                            <Link to={`/anime/${result.url}`}>
-                                {result.title}
-                            </Link>
-                        </li>
-                    ))}
+                    {searchResults.map((result, index) => {
+                        console.log(result);
+                        return (
+                            <li key={index}>
+                                <Link
+                                    to={`/watch/${result.id}/episode/1`}
+                                    className='text-black text-sm'
+                                >
+                                    {result.title}
+                                </Link>
+                            </li>
+                        );
+                    })}
                 </Dropdown>
             )}
         </SearchBarWrapper>

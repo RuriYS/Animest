@@ -2,7 +2,6 @@
 
 namespace App\Processors;
 
-use Illuminate\Support\Facades\Log;
 use RoachPHP\ItemPipeline\ItemInterface;
 use RoachPHP\ItemPipeline\Processors\ItemProcessorInterface;
 use RoachPHP\Support\Configurable;
@@ -19,7 +18,6 @@ class GogoProcessor implements ItemProcessorInterface
             }
         });
 
-        Log::debug(json_encode($item->all(), JSON_PRETTY_PRINT));
         return $item;
     }
 }

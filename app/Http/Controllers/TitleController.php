@@ -4,20 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ProcessTitle;
 use App\Models\Title;
-use App\Models\Episode;
+use App\Spiders\GogoSpider;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use RoachPHP\Roach;
 
 class TitleController extends Controller
 {
-    public function index()
-    {
-        $titles = Title::all();
-
-        return response()->json([
-            'count' => $titles->count(),
-            'titles' => $titles
-        ]);
-    }
-
     public function show(string $id)
     {
         $title = Title::find($id);
@@ -29,6 +22,7 @@ class TitleController extends Controller
 
         return response()->json([
             'endpoint' => 'titles',
+            'errors' => $title ? null : 'Not found',
             'query' => $id,
             'result' => $title?->toArray()
         ]);
@@ -39,6 +33,35 @@ class TitleController extends Controller
         ProcessTitle::dispatchSync($id);
         return response()->json([
             'message' => 'Job dispatched'
+        ]);
+    }
+
+
+    public function search(Request $request)
+    {
+        $q = $request->input('q');
+        $sort = $request->input('s') ?? 'title_az';
+
+        $cacheKey = "search_results:{$q}:{$sort}";
+
+        $results = Cache::remember($cacheKey, now()->addHours(4), function () use ($q, $sort) {
+            $params = http_build_query([
+                'keyword' => $q,
+                'sort' => $sort
+            ]);
+
+            $items = Roach::collectSpider(
+                GogoSpider::class,
+                context: ['uri' => "/filter.html?$params"]
+            );
+
+            return array_merge(...array_map(fn($item) => $item->all(), $items));
+        });
+
+        return response()->json([
+            'query' => $q,
+            'count' => count($results),
+            'results' => $results
         ]);
     }
 }

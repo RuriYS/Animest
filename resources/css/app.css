@@ -8,7 +8,7 @@ body {
     margin: 0;
     background: #000;
     font-family: "Inter", sans-serif;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 #root {
@@ -47,6 +47,12 @@ p {
 
 h1 {
     font-weight: 600;
+}
+
+p {
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: #8a8a8a;
 }
 
 video {

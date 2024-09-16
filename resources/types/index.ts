@@ -1,7 +1,7 @@
 export interface MetaProps {
     id: string;
     title: string;
-    language: 'sub' | 'dub';
+    language: 'SUB' | 'DUB';
     length: string | number;
     description: string;
     names: string;

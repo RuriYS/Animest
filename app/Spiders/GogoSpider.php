@@ -41,7 +41,6 @@ class GogoSpider extends BasicSpider
         $path = (string) parse_url($response->getUri(), PHP_URL_PATH);
         $paths = explode("/", $path);
 
-        Log::debug("Spider started crawling at: '$path' with status: {$response->getStatus()}");
         if ($response->getStatus() === 200) {
             switch ($paths[1]) {
                 case 'category':
@@ -61,10 +60,24 @@ class GogoSpider extends BasicSpider
                         'year' => $response->filter('.anime_info_body_bg p.type:nth-child(8)')->innerText(),
                     ]);
                     break;
-
+                case 'filter.html':
+                    yield $this->item(
+                        $response->filter('.items li')->each(function (Crawler $node) {
+                            $releasedNode = $node->filter('.released');
+                            $releasedNode ? preg_match('/\d+/', $releasedNode->text(), $matches) : null;
+                            $year = $matches[0] ?? null;
+                            return [
+                                'image' => $node->filter('.img img')->attr('src'),
+                                'title' => $node->filter('.name a[title]')->text(),
+                                'id' => explode('/', $node->filter('.name a[href]')->attr('href'))[2],
+                                'year' => $year,
+                            ];
+                        })
+                    );
+                    break;
                 default:
                     yield $this->item([
-                        'error' => 'No path specified',
+                        'error' => 'Invalid path specified',
                     ]);
                     break;
             }
@@ -75,5 +88,7 @@ class GogoSpider extends BasicSpider
                 'error' => "Title not found."
             ]);
         }
+
+        // file_put_contents(public_path('gogo_content.html'), $response->html());
     }
 }

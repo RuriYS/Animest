@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Title extends Model
 {
-    public $incrementing = false;
-    public $timestamps = false;
     protected $table = 'titles';
     protected $primaryKey = 'id';
     protected $keyType = 'string';

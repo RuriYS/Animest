@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, To, useLocation, useNavigate } from 'react-router-dom';
 import tw from 'twin.macro';
 import styled from '@emotion/styled';
 import MorphableSearchBar from '../elements/MorphableSearchBar';
@@ -36,8 +36,19 @@ const MobileNav = styled.div`
 `;
 
 const LINK = styled(Link)`
-    ${tw`text-gray-200 hover:text-white transition-all duration-300 ease-in-out`}
+    ${tw`text-gray-200 text-[0.8rem] hover:text-white transition-all duration-300 ease-in-out`}
 `;
+
+const links = [
+    {
+        path: '/home',
+        label: 'Home',
+    },
+    {
+        path: '/search',
+        label: 'Search',
+    },
+];
 
 const Header = () => {
     const [expanded, setExpanded] = useState(false);
@@ -54,10 +65,13 @@ const Header = () => {
                             </h1>
                         </Link>
                         <Navlinks className='hidden md:flex text-gray-500 hover:text-white'>
-                            <LINK to='/home'>Home</LINK>
-                            <LINK to='/catalog'>Catalog</LINK>
-                            <LINK to='/news'>News</LINK>
-                            <LINK to='/queues'>Queues</LINK>
+                            {links.map(({ path, label }) => {
+                                return (
+                                    <LINK key={path} to={path as To}>
+                                        {label}
+                                    </LINK>
+                                );
+                            })}
                         </Navlinks>
                         <FaBars
                             className='md:hidden'
@@ -74,10 +88,13 @@ const Header = () => {
                     >
                         <MobileNav ref={nodeRef}>
                             <Navlinks className='text-gray-500 hover:text-white'>
-                                <LINK to='/home'>Home</LINK>
-                                <LINK to='/catalog'>Catalog</LINK>
-                                <LINK to='/news'>News</LINK>
-                                <LINK to='/collections'>Collections</LINK>
+                                {links.map(({ path, label }) => {
+                                    return (
+                                        <LINK key={path} to={path as To}>
+                                            {label}
+                                        </LINK>
+                                    );
+                                })}
                             </Navlinks>
                             <MorphableSearchBar />
                         </MobileNav>

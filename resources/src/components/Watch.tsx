@@ -11,6 +11,7 @@ import {
 import useEpisodes from '@/hooks/useEpisodes';
 import moment from 'moment';
 import { SortMode } from 'types';
+import { WatchLoading } from '@/elements';
 
 const WatchContainer = styled.div`
     ${tw`flex flex-col gap-y-8 w-full bg-black`}
@@ -80,7 +81,7 @@ const Watch: React.FC = () => {
         setSort(sort);
     }, []);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <WatchLoading />;
     if (error) return <div>Error: {error.message}</div>;
     if (!meta || !sortedEpisodes || !currentEpisode) return null;
 
