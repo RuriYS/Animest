@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Anime, Home, News, Queues, Search, Terms, Watch } from './components';
+import { Anime, Home, News, Queues, Search, Terms, Watch } from '@/components';
 
 const Main = () => {
     return (

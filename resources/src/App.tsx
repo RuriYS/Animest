@@ -1,17 +1,15 @@
-import React, { Suspense, lazy } from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
-
-const MainContainer = lazy(() => import('./elements/MainContainer'));
-const GlobalStyles = lazy(() => import('./styles/GlobalStyles'));
-const Footer = lazy(() => import('./components/Footer'));
-const Header = lazy(() => import('./components/Header'));
-const Main = lazy(() => import('./Main'));
+import Main from '@/Main';
+import GlobalStyles from './styles/GlobalStyles';
+import MainContainer from './elements/MainContainer';
+import { Header, Footer, LoadingFallback } from '@/components';
 
 const App = () => {
     return (
         <BrowserRouter>
-            <Suspense fallback={<div></div>}>
+            <Suspense fallback={<LoadingFallback />}>
                 <MainContainer>
                     <Header />
                     <Main />

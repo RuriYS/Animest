@@ -69,8 +69,8 @@ const FeaturedBanner = () => {
                             {featured[currentIndex].brief}
                         </p>
                         <div className='flex space-x-2'>
-                            <Link to={`/anime/${featured[currentIndex].id}`}>
-                                <Button variant='primary'>
+                            <Link to={`/title/${featured[currentIndex].id}`}>
+                                <Button variant='secondary'>
                                     <FaInfoCircle size={16} />
                                     <span>Learn More</span>
                                 </Button>
@@ -78,7 +78,7 @@ const FeaturedBanner = () => {
                             <Link
                                 to={`/watch/${featured[currentIndex].id}/episode/1`}
                             >
-                                <Button variant='secondary'>
+                                <Button variant='primary'>
                                     <FaCirclePlay size={16} />
                                     <span>Watch</span>
                                 </Button>

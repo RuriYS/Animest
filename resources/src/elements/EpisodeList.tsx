@@ -31,11 +31,6 @@ const EpisodeList: React.FC<EpisodeListProps> = ({
             <h1 className='text-lg font-semibold'>Episodes</h1>
             <SortSelect onSortChange={onSortChange} />
         </div>
-        <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-        />
         <List>
             {episodes.map((episode) => (
                 <EpisodeCard
@@ -45,6 +40,11 @@ const EpisodeList: React.FC<EpisodeListProps> = ({
                 />
             ))}
         </List>
+        <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+        />
     </div>
 );
 

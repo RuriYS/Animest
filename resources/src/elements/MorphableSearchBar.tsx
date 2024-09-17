@@ -110,7 +110,7 @@ const MorphableSearchBar = () => {
                 <FaSearch />
             </SearchIcon>
             <SearchBar
-                placeholder={isExpanded ? 'Search...' : ''}
+                placeholder={isExpanded ? 'Do a quick search...' : ''}
                 isExpanded={isExpanded}
                 onFocus={() => setFocus(true)}
                 onBlur={handleBlur}
