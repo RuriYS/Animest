@@ -3,21 +3,30 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    --background: 0, 0%, 0%;
+    --foreground: 0, 0%, 100%;
+    --primary: 0, 0%, 100%;
+    --primary-foreground: 0, 0%, 0%;
+    --muted-foreground: 0, 0%, 80%;
+    --font-weight: 500;
+}
+
 html,
 body {
     margin: 0;
-    background: #000;
+    background: hsl(var(--background));
     font-family: "Inter", sans-serif;
     font-weight: 500;
 }
 
 #root {
-    background-color: black;
+    background-color: hsl(var(--background));
     min-height: 100vh;
     height: auto;
     display: flex;
     flex-direction: column;
-    color: white;
+    color: hsl(var(--foreground));
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -31,7 +40,6 @@ body {
     background: rgba(255, 255, 255, 80%);
 }
 
-
 main {
     flex: 1;
 }
@@ -42,7 +50,7 @@ h3,
 h4,
 a,
 p {
-    color: white;
+    color: hsl(var(--foreground));
 }
 
 h1 {
@@ -52,7 +60,7 @@ h1 {
 p {
     font-weight: 500;
     font-size: 0.8rem;
-    color: #8a8a8a;
+    color: hsl(var(--muted-foreground));
 }
 
 video {
