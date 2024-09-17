@@ -17,7 +17,7 @@ const WatchContainer = styled.div`
     ${tw`flex flex-col gap-y-8 w-full bg-black`}
 `;
 
-const Watch: React.FC = () => {
+export default function Watch() {
     const { id, episodeId } = useParams<{ id: string; episodeId: string }>();
     const navigate = useNavigate();
     const { loading, episodes, meta, error } = useEpisodes(id!);
@@ -119,6 +119,4 @@ const Watch: React.FC = () => {
             </WatchContainer>
         </Constraint>
     );
-};
-
-export default Watch;
+}

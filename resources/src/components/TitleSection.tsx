@@ -13,7 +13,7 @@ interface Title {
     genres: string[];
 }
 
-export default function Component() {
+export default function TitleSection() {
     const [titles, setTitles] = useState<Title[]>([]);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [scrollAmount, setScrollAmount] = useState(0);
