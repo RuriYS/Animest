@@ -58,7 +58,15 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
     private function collectAndProcessSpiderResults(string $id): array
     {
         Log::debug("Collecting spider results", ['id' => $id]);
-        $items = Roach::collectSpider(GogoSpider::class, context: ['uri' => "/category/$id"]);
+
+        $items = Roach::collectSpider(
+            GogoSpider::class,
+            context: [
+                'base_url' => config('app.urls.gogo'),
+                'uri' => "/category/$id"
+            ]
+        );
+
         $result = array_merge(...array_map(fn($item) => $item->all(), $items));
         Log::debug("Spider results collected", ['id' => $id, 'resultCount' => count($result)]);
         return $result;

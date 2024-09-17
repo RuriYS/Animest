@@ -51,7 +51,10 @@ class TitleController extends Controller
 
             $items = Roach::collectSpider(
                 GogoSpider::class,
-                context: ['uri' => "/filter.html?$params"]
+                context: [
+                    'base_url' => config('app.urls.gogo'),
+                    'uri' => "/filter.html?$params"
+                ]
             );
 
             return array_merge(...array_map(fn($item) => $item->all(), $items));

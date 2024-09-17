@@ -6,7 +6,6 @@ use App\Processors\VidstreamProcessor;
 use App\Utils\Ajax;
 use App\Utils\Dateparser;
 use Generator;
-use Illuminate\Support\Facades\Log;
 use RoachPHP\Downloader\Middleware\UserAgentMiddleware;
 use RoachPHP\Http\Request;
 use RoachPHP\Http\Response;
@@ -49,15 +48,13 @@ class VidstreamVideoSpider extends BasicSpider
         $dateparser = new Dateparser();
         $iframe = $response->filter('.play-video iframe[src]');
 
-        if ($iframe->count() === 1) {
-            // Details
+        if ($iframe) {
             yield $this->item([
                 'title' => $response->filter('.video-details .date')->innerText(true),
                 'description' => $response->filter('.video-details #rmjs-1')->innerText(true),
                 'episode_id' => $this->context['id']
             ]);
 
-            // Related Episodes
             yield $this->item([
                 'episodes' =>
                     $response->filter('.listing.lists li')->each(
@@ -89,7 +86,6 @@ class VidstreamVideoSpider extends BasicSpider
         $token = $ajax->decryptToken($token);
         $video_id = $response->filter('#id')->attr('value');
 
-        // Video data
         yield $this->item([
             'title' => urldecode(str_replace('+', ' ', $response->filter('#title')->attr('value'))),
             'video_id' => $response->filter('#id')->attr('value'),
