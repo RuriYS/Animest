@@ -52,4 +52,7 @@ export default defineConfig({
         },
         hmr: false,
     },
+    build: {
+        chunkSizeWarningLimit: 1000,
+    },
 });
