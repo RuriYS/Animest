@@ -1,5 +1,5 @@
 import { Constraint, ContentContainer, SearchResult } from '@/elements';
-import { Search, Sliders } from 'lucide-react';
+import { Loader2, Search, Sliders } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,15 +17,16 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { styled } from 'twin.macro';
+import tw, { styled } from 'twin.macro';
 import axios from 'axios';
 import { debounce } from 'lodash';
 
 const ResultContainer = styled.div`
+    ${tw`p-0 md:p-4`}
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
-    padding: 16px;
+    position: relative;
 `;
 
 interface Result {
@@ -42,6 +43,7 @@ export default function SearchComponent() {
     const [sortType, setSortType] = useState<
         'title_az' | 'recently_added' | 'recently_updated' | 'release' | string
     >('title_az');
+    const [loading, setLoading] = useState(true);
 
     const exactMatchRef = useRef(exactMatch);
     const searchTermRef = useRef(searchTerm);
@@ -69,11 +71,13 @@ export default function SearchComponent() {
                 console.error('Error fetching search results:', error);
                 setSearchResults([]);
             }
+            setLoading(false);
         }, 300),
         [],
     );
 
     useEffect(() => {
+        setLoading(true);
         searchTermRef.current = searchTerm;
         sortTypeRef.current = sortType;
         exactMatchRef.current = exactMatch;
@@ -156,25 +160,13 @@ export default function SearchComponent() {
                                                 Exact match
                                             </Label>
                                         </div>
-                                        {/* <div className='flex items-center space-x-2'>
-                                            <Switch id='include-archived' />
-                                            <Label htmlFor='include-archived'>
-                                                Include archived
-                                            </Label>
-                                        </div>
-                                        <div className='flex items-center space-x-2'>
-                                            <Switch id='search-titles-only' />
-                                            <Label htmlFor='search-titles-only'>
-                                                Search titles only
-                                            </Label>
-                                        </div> */}
                                     </div>
                                 </div>
                             </PopoverContent>
                         </Popover>
                         <Button
                             type='submit'
-                            className='shrink-0 bg-neutral-400 hover:bg-neutral-300 text-black'
+                            className='shrink-0 bg-neutral-200 hover:bg-neutral-400 text-black'
                             onClick={fetchResults}
                         >
                             <Search className='h-4 w-4 mr-2' />
@@ -188,18 +180,29 @@ export default function SearchComponent() {
                         </div>
                     )}
                 </div>
-                <ResultContainer>
-                    {searchResults.map(({ image, title, id, year }, _) => {
-                        return (
+                {loading ? (
+                    <div className='w-full h-full flex flex-col items-center justify-center'>
+                        <Loader2 className='h-16 w-16 animate-spin text-primary' />
+                        <h2 className='mt-4 text-2xl font-semibold text-foreground'>
+                            Searching...
+                        </h2>
+                        <p className='mt-2 text-muted-foreground'>
+                            Getting results
+                        </p>
+                    </div>
+                ) : (
+                    <ResultContainer>
+                        {searchResults.map(({ image, title, id, year }) => (
                             <SearchResult
+                                key={id}
                                 image={image}
                                 title={title}
                                 id={id}
                                 year={year}
                             />
-                        );
-                    })}
-                </ResultContainer>
+                        ))}
+                    </ResultContainer>
+                )}
             </ContentContainer>
         </Constraint>
     );
