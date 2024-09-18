@@ -20,11 +20,13 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected string $id;
+    protected string $titleId;
     public $uniqueFor = 3600;
 
-    public function __construct(string $id)
+    public function __construct(string $id, string $titleId)
     {
         $this->id = $id;
+        $this->titleId = $titleId;
     }
 
     public function uniqueId(): string
@@ -34,41 +36,39 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
 
     public function handle()
     {
-        Log::info("Starting to process Episode", ['id' => $this->id]);
+        Log::debug('Processing Episode', ['id' => $this->id, 'title_id' => $this->titleId]);
 
         try {
             $results = $this->collectSpiderResults();
 
             if (isset($results['error'])) {
-                Log::warning("Episode Job discarded", ['id' => $this->id, 'reason' => $results['error']]);
+                Log::warning('Episode Job discarded', ['id' => $this->id, 'reason' => $results['error']]);
                 return;
             }
 
             $episodeData = $this->processResults($results);
-            $this->ensureTitleExists($episodeData['title_id']);
+
+            $this->ensureTitleExists($this->titleId);
             $this->createOrUpdateEpisode($episodeData);
 
-            Log::info("Episode successfully processed", ['id' => $this->id]);
         } catch (\Exception $e) {
-            Log::error("Error processing Episode", ['id' => $this->id, 'error' => $e->getMessage()]);
+            Log::error('Episode process error', ['id' => $this->id, 'error' => $e->getMessage()]);
         }
     }
 
     private function collectSpiderResults(): array
     {
-        Log::debug("Collecting spider results", ['id' => $this->id]);
         $items = Roach::collectSpider(VidstreamVideoSpider::class, context: ['id' => $this->id]);
         $results = array_merge(...array_map(fn($item) => $item->all(), $items));
-        Log::debug("Spider results collected", ['id' => $this->id, 'resultCount' => count($results)]);
+
+        Log::debug('Spider collected', ['id' => $this->id, 'resultCount' => count($results), 'results' => $results]);
         return $results;
     }
 
     private function processResults(array $results): array
     {
-        Log::debug("Processing spider results", ['id' => $this->id]);
-
         $episodeId = trim($results['episode_id'] ?? '');
-        $titleId = explode('-episode', $episodeId)[0] ?? null;
+        $titleId = $this->titleId;
 
         $episodes = $results['episodes'] ?? [];
         $meta = $this->findEpisodeMeta($episodes, $episodeId);
@@ -77,7 +77,7 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
             throw new \Exception("Invalid episode or title ID");
         }
 
-        Log::debug("Results processed", ['episodeId' => $episodeId, 'titleId' => $titleId]);
+        Log::debug('Results processed', ['episodeId' => $episodeId, 'titleId' => $titleId]);
 
         return [
             'id' => $episodeId,
@@ -99,20 +99,18 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
 
     private function ensureTitleExists(string $titleId): void
     {
-        Log::debug("Checking if Title exists", ['titleId' => $titleId]);
         if (!Title::where('id', $titleId)->exists()) {
-            Log::info("Title not found, creating new Title", ['titleId' => $titleId]);
+            Log::debug('Title not found, creating new Title', ['titleId' => $titleId]);
             ProcessTitle::dispatchSync($titleId);
         }
     }
 
     private function createOrUpdateEpisode(array $episodeData): void
     {
-        Log::debug("Creating or updating Episode", ['id' => $episodeData['id']]);
         $episode = Episode::updateOrCreate(
             ['id' => $episodeData['id']],
             $episodeData
         );
-        Log::debug("Episode created or updated", ['id' => $episode->id]);
+        Log::debug('Episode updated', ['id' => $episode->id]);
     }
 }
