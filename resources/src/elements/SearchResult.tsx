@@ -94,12 +94,11 @@ export default function SearchResult({ id, title, image, year }: Props) {
                 const viewportWidth = window.innerWidth;
                 const cardWidth = rect.width;
                 const expandedWidth = cardWidth * 1.25;
-                const margin = 20;
 
                 let xOffset = 0;
 
                 if (rect.left < expandedWidth / 2) {
-                    xOffset = -rect.left + margin;
+                    xOffset = 0;
                 } else if (rect.right + expandedWidth > viewportWidth) {
                     xOffset = -50;
                 } else {
@@ -133,6 +132,8 @@ export default function SearchResult({ id, title, image, year }: Props) {
                 animate={{}}
                 transition={{ duration: 0.3 }}
                 onClick={handleExpand}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
             >
                 <motion.img
                     src={image}
@@ -150,7 +151,7 @@ export default function SearchResult({ id, title, image, year }: Props) {
                             isExpanded && 'hidden'
                         } absolute flex flex-col gap-2 bottom-0 p-4 shadow-lg`}
                     >
-                        <span className='text-base font-bold text-foreground'>
+                        <span className='text-base font-bold text-foreground line-clamp-3'>
                             {title}
                         </span>
                         <span className='text-sm text-muted-foreground'>
@@ -206,7 +207,7 @@ export default function SearchResult({ id, title, image, year }: Props) {
                                             >
                                                 <X className='h-4 w-4' />
                                             </Button>
-                                            <h2 className='text-2xl font-bold text-white mb-2'>
+                                            <h2 className='text-2xl font-bold text-white mb-2 line-clamp-3'>
                                                 {title}
                                             </h2>
                                             <p className='text-lg text-gray-300 mb-3'>
