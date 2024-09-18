@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\ProxyController;
 use App\Http\Controllers\TitleController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EpisodeController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,3 +27,5 @@ Route::prefix('/titles')
         Route::get('/{id}', [TitleController::class, 'show']);
         Route::get('/{id}/process', [TitleController::class, 'process']);
     });
+
+Route::get('/proxy/{uri}', [ProxyController::class, 'proxy'])->where('uri', '.*');
