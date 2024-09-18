@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('episodes', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('title_id');
-            $table->string('download_url')->nullable();
+            $table->text('download_url')->charset('binary')->nullable();
             $table->string('episode_index')->nullable();
             $table->string('upload_date')->nullable();
             $table->json('video')->nullable();
