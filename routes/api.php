@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\MainController;
 use App\Http\Controllers\ProxyController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TitleController;
 use App\Http\Controllers\EpisodeController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/test', [MainController::class, 'test']);
 
 Route::prefix('/spider')
     ->group(function () {
@@ -28,4 +32,7 @@ Route::prefix('/titles')
         Route::get('/{id}/process', [TitleController::class, 'process']);
     });
 
-Route::get('/proxy/{uri}', [ProxyController::class, 'proxy'])->where('uri', '.*');
+Route::get('/search{params?}', [SearchController::class, 'search'])->where('params', '.*');
+Route::get('/proxy/{uri}', [ProxyController::class, 'proxy'])
+    ->where('uri', '.*')
+    ->middleware('throttle:proxy');

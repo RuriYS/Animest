@@ -20,12 +20,14 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, SerializesModels;
 
-    protected $id;
+    protected string $id;
+    protected bool $processEps;
     public $uniqueFor = 3600;
 
-    public function __construct(string $id)
+    public function __construct(string $id, bool $processEps = true)
     {
         $this->id = $id;
+        $this->processEps = $processEps;
     }
 
     public function uniqueId(): string
@@ -35,41 +37,44 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
 
     public function handle(): void
     {
-        $id = str($this->id);
+        $id = str($this->id)->toString();
         Log::debug('Processing Title', ['id' => $id]);
 
         try {
-            $result = $this->collectAndProcessSpiderResults($id);
+            $result = $this->collectSpider($id);
+
             if (isset($result['error'])) {
                 Log::warning('Title Job discarded', ['id' => $this->id, 'reason' => $result['error']]);
                 return;
             }
 
-            $title = $this->createOrUpdateTitle($result);
+            $title = $this->updateTitle($result);
             $this->processGenres($result['genres'] ?? [], $title);
-            $this->processEpisodes($result['alias'], $result['length']);
+
+            if ($this->processEps) {
+                $this->processEpisodes($result['alias'], $result['length']);
+            }
 
         } catch (\Exception $e) {
             Log::error('Title processing failed', ['id' => $id, 'error' => $e->getMessage()]);
         }
     }
 
-    private function collectAndProcessSpiderResults(string $id): array
+    private function collectSpider(string $id): array
     {
         $items = Roach::collectSpider(
             GogoSpider::class,
             context: [
-                'base_url' => config('app.urls.gogo'),
-                'uri' => "/category/$id"
+                'uri' => 'https://' . config('app.urls.gogo') . "/category/$id"
             ]
         );
 
         $result = array_merge(...array_map(fn($item) => $item->all(), $items));
-        Log::debug('Spider results collected', ['id' => $id, 'resultCount' => count($result)]);
+        Log::debug('Spider collected', ['id' => $id, 'resultCount' => count($result)]);
         return $result;
     }
 
-    private function createOrUpdateTitle(array $result): Title
+    private function updateTitle(array $result): Title
     {
         $titleData = array_diff_key($result, array_flip(['genres']));
         $title = Title::updateOrCreate(['id' => $result['id']], $titleData);
@@ -99,8 +104,6 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
 
     private function processEpisodes(string $alias, int $length): void
     {
-        Log::debug("Dispatching episode jobs", ['alias' => $alias, 'totalEpisodes' => $length]);
-
         $existingEpisodes = Episode::where('title_id', $alias)
             ->pluck('episode_index')
             ->toArray();
@@ -118,6 +121,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
         $jobCount = count($jobs);
 
         if (!empty($jobs)) {
+            Log::debug("Dispatching episode jobs", ['alias' => $alias, 'totalEpisodes' => $length]);
             Bus::batch($jobs)
                 ->progress(function (Batch $batch) use ($jobCount, $alias) {
                     $processed = $batch->processedJobs();

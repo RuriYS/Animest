@@ -37,7 +37,7 @@ class GogoSpider extends BasicSpider
         return [
             new Request(
                 method: 'GET',
-                uri: $this->context['base_url'] . $this->context['uri'],
+                uri: $this->context['uri'],
                 parseMethod: [$this, 'parse']
             )
         ];
@@ -58,7 +58,7 @@ class GogoSpider extends BasicSpider
     {
         // file_put_contents(public_path('gogo_content.html'), $response->html());
 
-        $path = (string) parse_url($response->getUri(), PHP_URL_PATH);
+        $path = parse_url($response->getUri(), PHP_URL_PATH);
         $paths = explode("/", $path);
 
         if ($response->getStatus() === 200) {

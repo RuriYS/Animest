@@ -136,6 +136,7 @@ return [
         'gogo' => env('GOGO_URL', ''),
         'vidstream' => env('VIDSTREAM_URL', ''),
         'api' => env('API_URL', ''),
+        'proxy_origin' => env('PROXY_ORIGIN', ''),
     ],
 
     'user_agent' => env('USER_AGENT', ''),

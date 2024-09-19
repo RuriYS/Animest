@@ -3,15 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ProcessEpisode;
+use App\Jobs\ProcessTitle;
 use App\Models\Episode;
 
 class EpisodeController extends Controller
 {
-    public function index(string $anime_id)
+    public function index(string $title_id)
     {
-        $episodes = Episode::where('title_id', $anime_id)->get();
+        $episodes = Episode::where('title_id', $title_id)->get();
+
+        if ($episodes->isEmpty()) {
+            ProcessTitle::dispatchSync($title_id, true);
+        }
+
         return response()->json([
-            'query' => $anime_id,
+            'query' => $title_id,
             'exists' => $episodes->isNotEmpty(),
             'episodes' => $episodes
         ]);

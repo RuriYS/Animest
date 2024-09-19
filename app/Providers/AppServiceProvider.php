@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use GuzzleHttp\Client;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        RateLimiter::for('proxy', function ($request) {
+            return Limit::perMinute(maxAttempts: 30)->by($request->ip());
+        });
     }
 }

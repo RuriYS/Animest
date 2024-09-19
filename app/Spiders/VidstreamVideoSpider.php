@@ -19,7 +19,7 @@ class VidstreamVideoSpider extends BasicSpider
         return [
             new Request(
                 'GET',
-                'https://s3taku.com/videos/' . $this->context['id'],
+                $this->context['base_url'] . $this->context['id'],
                 [$this, 'parse']
             )
         ];
@@ -48,7 +48,7 @@ class VidstreamVideoSpider extends BasicSpider
         $dateparser = new Dateparser();
         $iframe = $response->filter('.play-video iframe[src]');
 
-        if ($iframe) {
+        if ($iframe->count() >= 1) {
             yield $this->item([
                 'title' => $response->filter('.video-details .date')->innerText(true),
                 'description' => $response->filter('.video-details #rmjs-1')->innerText(true),

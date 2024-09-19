@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Title;
 use App\Models\Episode;
 use App\Spiders\VidstreamVideoSpider;
+use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -38,30 +39,32 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
     {
         Log::debug('Processing Episode', ['id' => $this->id, 'title_id' => $this->titleId]);
 
-        try {
-            $results = $this->collectSpiderResults();
+        $results = $this->collectSpiderResults();
 
-            if (isset($results['error'])) {
-                Log::warning('Episode Job discarded', ['id' => $this->id, 'reason' => $results['error']]);
-                return;
-            }
-
-            $episodeData = $this->processResults($results);
-
-            $this->ensureTitleExists($this->titleId);
-            $this->createOrUpdateEpisode($episodeData);
-
-        } catch (\Exception $e) {
-            Log::error('Episode process error', ['id' => $this->id, 'error' => $e->getMessage()]);
+        if (isset($results['error'])) {
+            // Log::warning('Episode Job discarded', ['id' => $this->id, 'reason' => $results['error']]);
+            throw new Exception("{$results['error']}", 1);
         }
+
+        $episodeData = $this->processResults($results);
+
+        $this->ensureTitleExists($this->titleId);
+        $this->createOrUpdateEpisode($episodeData);
     }
 
     private function collectSpiderResults(): array
     {
-        $items = Roach::collectSpider(VidstreamVideoSpider::class, context: ['id' => $this->id]);
+        $items = Roach::collectSpider(VidstreamVideoSpider::class, context: [
+            'base_url' => config('app.urls.vidstream'),
+            'id' => $this->id
+        ]);
         $results = array_merge(...array_map(fn($item) => $item->all(), $items));
 
-        Log::debug('Spider collected', ['id' => $this->id, 'resultCount' => count($results), 'results' => $results]);
+        Log::debug('Spider collected', [
+            'episode_id' => $this->id,
+            'results' => $results
+        ]);
+
         return $results;
     }
 
