@@ -15,4 +15,16 @@ class CateParser
         $split = explode('/', $str);
         return $split[-1];
     }
+
+    public static function parseTitleId(string $str): string
+    {
+        preg_match('/^\/category\/(.+)$/', $str, $matches);
+        return $matches[1];
+    }
+
+    public static function parseGenre(string $str): string
+    {
+        preg_match('/^\/genre\/(.+)$/', $str, $matches);
+        return $matches[1];
+    }
 }

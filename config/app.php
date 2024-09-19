@@ -133,6 +133,7 @@ return [
     */
 
     'urls' => [
+        'ajax' => env('GOGO_AJAX_URL', ''),
         'gogo' => env('GOGO_URL', ''),
         'vidstream' => env('VIDSTREAM_URL', ''),
         'api' => env('API_URL', ''),

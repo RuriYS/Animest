@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\ProxyController;
 use App\Http\Controllers\SearchController;
@@ -36,3 +37,8 @@ Route::get('/search{params?}', [SearchController::class, 'search'])->where('para
 Route::get('/proxy/{uri}', [ProxyController::class, 'proxy'])
     ->where('uri', '.*')
     ->middleware('throttle:proxy');
+
+Route::prefix('/ajax')
+    ->group(function () {
+        Route::get('/popular', [AjaxController::class, 'popularReleases']);
+    });
