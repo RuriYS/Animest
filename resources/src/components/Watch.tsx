@@ -22,7 +22,7 @@ export default function Watch() {
     const navigate = useNavigate();
     const { loading, episodes, meta, error } = useEpisodes(id!);
     const [currentPage, setCurrentPage] = useState(1);
-    const [sortMode, setSort] = useState<SortMode>('newest');
+    const [sortMode, setSort] = useState<SortMode>('index-asc');
     const episodesPerPage = 10;
 
     const sortedEpisodes = useMemo(() => {

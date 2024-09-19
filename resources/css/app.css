@@ -10,6 +10,7 @@
     --primary-foreground: 0, 0%, 0%;
     --muted-foreground: 0, 0%, 60%;
     --font-weight: 500;
+    --popover: var(--foreground);
 }
 
 html,
