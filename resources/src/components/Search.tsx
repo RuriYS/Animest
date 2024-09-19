@@ -53,7 +53,7 @@ export default function SearchComponent() {
         debounce(async () => {
             try {
                 const { data } = await axios.get(
-                    `/api/titles?q=${encodeURIComponent(
+                    `/api/search?q=${encodeURIComponent(
                         searchTermRef.current,
                     )}&s=${sortTypeRef.current}`,
                 );
