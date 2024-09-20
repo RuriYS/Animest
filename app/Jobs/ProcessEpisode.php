@@ -22,7 +22,6 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
 
     protected string $id;
     protected string $titleId;
-    public $uniqueFor = 3600;
 
     public function __construct(string $id, string $titleId)
     {
@@ -32,7 +31,12 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
 
     public function uniqueId(): string
     {
-        return $this->id;
+        return "{$this->id}_{$this->titleId}";
+    }
+
+    public function uniqueFor(): int
+    {
+        return 3600;
     }
 
     public function handle()
