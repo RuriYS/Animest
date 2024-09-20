@@ -17,7 +17,7 @@ class TitleController extends Controller
         }
 
         return response()->json([
-            'errors' => $title ? null : 'Not found',
+            'errors' => $title ? null : 'Title not found, it\'s either invalid or doesn\'t exist',
             'query' => $id,
             'result' => $title?->toArray()
         ]);

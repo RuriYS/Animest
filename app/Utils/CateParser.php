@@ -27,4 +27,10 @@ class CateParser
         preg_match('/^\/genre\/(.+)$/', $str, $matches);
         return $matches[1];
     }
+
+    public static function parseThumbnail(string $str): string
+    {
+        preg_match('/(https:\/\/[^\'")]+)/', $str, $matches);
+        return $matches[1];
+    }
 }

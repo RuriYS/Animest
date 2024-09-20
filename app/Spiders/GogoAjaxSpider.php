@@ -4,6 +4,7 @@ namespace App\Spiders;
 
 use App\Utils\CateParser;
 use Generator;
+use Illuminate\Support\Facades\Log;
 use RoachPHP\Http\Request;
 use RoachPHP\Http\Response;
 use RoachPHP\Spider\BasicSpider;
@@ -33,14 +34,14 @@ class GogoAjaxSpider extends BasicSpider
     public function parse(Response $response): Generator
     {
         $path = parse_url($response->getUri(), PHP_URL_PATH);
-        $paths = explode("/", $path);
+        $paths = array_filter(explode("/", $path));
 
+        if ($response->getStatus() && count($paths) >= 2) {
+            $path = implode("/", array_slice($paths, 0, 2));
 
-        if ($response->getStatus() === 200) {
-
-            // https://ajax.gogocdn.net/ajax/page-recent-release-ongoing.html?page=1
-            switch ($paths[2]) {
-                case 'page-recent-release-ongoing.html':
+            Log::debug("Path: $path");
+            switch ($path) {
+                case 'ajax/page-recent-release-ongoing.html':
                     yield from $this->parsePopularReleases($response);
             }
         }
@@ -63,6 +64,8 @@ class GogoAjaxSpider extends BasicSpider
                     return Cateparser::parseGenre($subnode->attr('href') ?? '');
                 }),
                 'latest_episode_id' => substr($node->filter('p:nth-of-type(2) > a')->attr('href'), 1),
+                'thumbnail' => CateParser::parseThumbnail($node->filter('.thumbnail-popular')->attr('style')),
+                'title' => $node->filter('a:nth-of-type(2)')->text(),
             ];
         });
 

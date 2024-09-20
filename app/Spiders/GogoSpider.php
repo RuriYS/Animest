@@ -56,15 +56,13 @@ class GogoSpider extends BasicSpider
     ];
     public function parse(Response $response): Generator
     {
-        // file_put_contents(public_path('gogo_content.html'), $response->html());
-
         $path = parse_url($response->getUri(), PHP_URL_PATH);
-        $paths = explode("/", $path);
+        $paths = array_filter(explode("/", $path));
 
-        if ($response->getStatus() === 200) {
+        if ($response->getStatus() === 200 && isset($paths[1])) {
             switch ($paths[1]) {
                 case 'category':
-                    yield from $this->parseCategory($response, $paths);
+                    yield from $this->parseCategory($response, $paths[2]);
                     break;
                 case 'filter.html':
                     yield from $this->parseFilterResults($response);
@@ -75,19 +73,15 @@ class GogoSpider extends BasicSpider
                     ]);
                     break;
             }
-
-
         } else {
             yield $this->item([
-                'error' => "Title not found."
+                'error' => 'Invalid Request'
             ]);
         }
     }
 
-    public function parseCategory(Response $response, array $paths): Generator
+    public function parseCategory(Response $response, string $id): Generator
     {
-        $id = $paths[2];
-
         $paginationNode = $response->filter('#episode_page > li:nth-child(1) > a');
 
         $paginationData = [

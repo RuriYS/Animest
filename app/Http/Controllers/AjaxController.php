@@ -20,7 +20,7 @@ class AjaxController extends Controller
             $items = Roach::collectSpider(
                 GogoAjaxSpider::class,
                 context: [
-                    'uri' => 'https://' . config('app.urls.ajax') . "page-recent-release-ongoing.html?page=$page"
+                    'uri' => 'https://' . config('app.urls.ajax') . "/ajax/page-recent-release-ongoing.html?page=$page"
                 ]
             );
             return array_merge(
