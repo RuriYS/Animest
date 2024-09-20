@@ -16,14 +16,16 @@ export default function WatchLoading() {
         <Constraint>
             <ContentContainer>
                 <div className='flex flex-col gap-4'>
-                    <h1>The episode is loading...</h1>
+                    <h1 className='text-lg'>The episode is loading...</h1>
                     {showMessage && (
                         <>
-                            <p>
+                            <p className='muted'>
                                 Our tiny spiders are doing their best to crawl
                                 the data for you, please wait {'<3'}
                             </p>
-                            <p>We'll let you know when it's ready.</p>
+                            <p className='muted'>
+                                We'll let you know when it's ready.
+                            </p>
                         </>
                     )}
                 </div>

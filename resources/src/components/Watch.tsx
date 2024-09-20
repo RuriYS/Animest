@@ -1,9 +1,10 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from '@emotion/styled';
 import tw from 'twin.macro';
 import {
     Constraint,
+    ContentContainer,
     EpisodeInfo,
     EpisodeList,
     PlayerWrapper,
@@ -18,12 +19,21 @@ const WatchContainer = styled.div`
 `;
 
 export default function Watch() {
-    const { id, episodeId } = useParams<{ id: string; episodeId: string }>();
     const navigate = useNavigate();
+    const { id, episodeIndex } = useParams<{
+        id: string;
+        episodeIndex?: string;
+    }>();
     const { loading, episodes, meta, error } = useEpisodes(id!);
     const [currentPage, setCurrentPage] = useState(1);
     const [sortMode, setSort] = useState<SortMode>('index-asc');
     const episodesPerPage = 10;
+
+    useEffect(() => {
+        if (!episodeIndex) {
+            navigate(`/watch/${id}/episode/1`);
+        }
+    }, [id, episodeIndex, navigate]);
 
     const sortedEpisodes = useMemo(() => {
         if (!episodes) return null;
@@ -57,8 +67,8 @@ export default function Watch() {
     }, [episodes, sortMode]);
 
     const currentEpisode = useMemo(
-        () => sortedEpisodes?.find((ep) => ep.episode_index === episodeId),
-        [sortedEpisodes, episodeId],
+        () => sortedEpisodes?.find((ep) => ep.episode_index === episodeIndex),
+        [sortedEpisodes, episodeIndex],
     );
 
     const handleEpisodeEnd = useCallback(() => {
@@ -82,7 +92,25 @@ export default function Watch() {
     }, []);
 
     if (loading) return <WatchLoading />;
-    if (error) return <div>Error: {error.message}</div>;
+    if (error)
+        return (
+            <ContentContainer>
+                <Constraint>
+                    <div className='flex flex-col gap-4'>
+                        <h1 className='text-lg'>{`The resource doesn't seem to exist :(`}</h1>
+                        <span>
+                            <p className='muted'>
+                                If you think that this is a mistake, please
+                                contact the developers.
+                            </p>
+                            <p className='muted'>
+                                Error message: "{error.message}"
+                            </p>
+                        </span>
+                    </div>
+                </Constraint>
+            </ContentContainer>
+        );
     if (!meta || !sortedEpisodes || !currentEpisode) return null;
 
     const indexOfLastEpisode = currentPage * episodesPerPage;

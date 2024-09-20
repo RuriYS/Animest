@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Info, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface Props {
@@ -20,22 +20,14 @@ interface MovieDetails {
 }
 
 export default function SearchResult({ id, title, image, year }: Props) {
+    const navigate = useNavigate();
     const [isExpanded, setIsExpanded] = useState(false);
     const [details, setDetails] = useState<MovieDetails | null>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const cardRef = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 0 });
 
-    const fetchMovieDetails = async () => {
-        // await new Promise((resolve) => setTimeout(resolve, 1000));
-        // setDetails({
-        //     summary:
-        //         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        //     genres: ['Sci-Fi', 'Adventure', 'Drama'],
-        //     seasons: 2,
-        //     // backgroundVideo: 'http://localhost:9000/videos/shikanokoko.mp4',
-        // });
-
+    const fetchDetails = async () => {
         const { data } = await axios.get(`/api/titles/${id}`);
         if (data.result) {
             const result = data.result;
@@ -48,7 +40,7 @@ export default function SearchResult({ id, title, image, year }: Props) {
 
     const handleExpand = () => {
         if (!isExpanded && !details) {
-            fetchMovieDetails();
+            fetchDetails();
         }
         setIsExpanded(true);
     };
@@ -131,7 +123,7 @@ export default function SearchResult({ id, title, image, year }: Props) {
                 }}
                 animate={{}}
                 transition={{ duration: 0.3 }}
-                onClick={handleExpand}
+                onClick={() => navigate(`/watch/${id}`)}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
             >

@@ -24,9 +24,13 @@ import { debounce } from 'lodash';
 const ResultContainer = styled.div`
     ${tw`p-0 md:p-4`}
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 16px;
     position: relative;
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
 `;
 
 interface Result {
@@ -36,7 +40,7 @@ interface Result {
     year: string;
 }
 
-export default function SearchComponent() {
+export default function Component() {
     const [exactMatch, setExactMatch] = useState(false);
     const [searchResults, setSearchResults] = useState<Result[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -87,7 +91,7 @@ export default function SearchComponent() {
     return (
         <Constraint>
             <ContentContainer>
-                <h1 className='text-xl m-auto'>Search titles</h1>
+                <h1 className='text-xl m-auto'>Browse titles</h1>
                 <div className='w-full max-w-3xl mx-auto p-4 space-y-4'>
                     <div className='flex space-x-2'>
                         <div className='flex-grow'>

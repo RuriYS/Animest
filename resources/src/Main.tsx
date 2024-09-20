@@ -7,13 +7,16 @@ const Main = () => {
         <Routes>
             <Route path='*' element={<Navigate to={'/home'} />} />
             <Route path='/home' element={<Home />} />
+            <Route path='/browse' element={<Search />} />
             <Route path='/catalog' />
             <Route path='/news' element={<News />} />
             <Route path='/queues' element={<Queues />} />
-            <Route path='/anime/:id' element={<Anime />} />
             <Route path='/terms' element={<Terms />} />
-            <Route path='/search' element={<Search />} />
-            <Route path='/watch/:id/episode/:episodeId' element={<Watch />} />
+            <Route path='/watch/:id' element={<Watch />} />
+            <Route
+                path='/watch/:id/episode/:episodeIndex'
+                element={<Watch />}
+            />
         </Routes>
     );
 };

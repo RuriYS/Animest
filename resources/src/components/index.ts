@@ -5,9 +5,9 @@ import Home from './Home';
 import LoadingFallback from './LoadingFallback';
 import News from './News';
 import Queues from './Queues';
-import Search from './Search';
+import Search from './Browse';
 import Terms from './Terms';
-import Section from './TitleSection';
+import Section from './Section';
 import Watch from './Watch';
 
 export {

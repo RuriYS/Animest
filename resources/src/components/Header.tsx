@@ -45,8 +45,8 @@ const links = [
         label: 'Home',
     },
     {
-        path: '/search',
-        label: 'Search',
+        path: '/browse',
+        label: 'Browse',
     },
 ];
 

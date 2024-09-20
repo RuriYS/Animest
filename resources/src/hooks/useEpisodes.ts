@@ -21,10 +21,12 @@ function useInterval(callback: () => void, delay: number | null) {
 }
 
 export default function useEpisodesAndMeta(id: string) {
-    const [loading, setLoading] = useState(true);
-    const [episodes, setEpisodes] = useState<EpisodeProps[] | null>(null);
-    const [meta, setMeta] = useState<MetaProps | null>(null);
-    const [error, setError] = useState<Error | null>(null);
+    const [state, setState] = useState({
+        loading: true,
+        episodes: null as EpisodeProps[] | null,
+        meta: null as MetaProps | null,
+        error: null as Error | null,
+    });
     const [episodesPolling, setEpisodesPolling] = useState(true);
     const [metaPolling, setMetaPolling] = useState(true);
 
@@ -32,12 +34,21 @@ export default function useEpisodesAndMeta(id: string) {
         try {
             const { data } = await axios.get(`/api/videos/${id}`);
             if (data.exists) {
-                setEpisodes(data.episodes);
-                setLoading(false);
+                setState((prev) => ({
+                    ...prev,
+                    episodes: data.episodes,
+                    loading: false,
+                }));
                 setEpisodesPolling(false);
             }
         } catch (error) {
-            setError(error as Error);
+            setState((prev) => ({
+                ...prev,
+                error: error as Error,
+                loading: false,
+            }));
+            setEpisodesPolling(false);
+            setMetaPolling(false);
         }
     }, [id]);
 
@@ -45,11 +56,19 @@ export default function useEpisodesAndMeta(id: string) {
         try {
             const { data } = await axios.get(`/api/titles/${id}`);
             if (data.result) {
-                setMeta(data.result);
+                setState((prev) => ({ ...prev, meta: data.result }));
                 setMetaPolling(false);
+            } else if (data.errors) {
+                throw new Error(data.errors);
             }
         } catch (error) {
-            setError(error as Error);
+            setState((prev) => ({
+                ...prev,
+                error: error as Error,
+                loading: false,
+            }));
+            setEpisodesPolling(false);
+            setMetaPolling(false);
         }
     }, [id]);
 
@@ -61,5 +80,5 @@ export default function useEpisodesAndMeta(id: string) {
         fetchEpisodes();
     }, [fetchEpisodes, fetchMeta]);
 
-    return { loading, episodes, meta, error };
+    return state;
 }
