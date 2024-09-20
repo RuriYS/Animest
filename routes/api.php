@@ -33,7 +33,12 @@ Route::prefix('/titles')
         Route::get('/{id}/process', [TitleController::class, 'process']);
     });
 
-Route::get('/search{params?}', [SearchController::class, 'search'])->where('params', '.*');
+Route::prefix('/search')
+    ->group(function () {
+        Route::get('/{params?}', [SearchController::class, 'search'])->where('params', '.*');
+        Route::get('/quick/{params?}', [SearchController::class, 'quicksearch'])->where('params', '.*');
+    });
+
 Route::get('/proxy/{uri}', [ProxyController::class, 'proxy'])
     ->where('uri', '.*')
     ->middleware('throttle:proxy');
