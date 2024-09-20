@@ -28,7 +28,6 @@ body {
     display: flex;
     flex-direction: column;
     color: hsl(var(--foreground));
-    -webkit-tap-highlight-color: transparent;
 }
 
 ::-moz-selection {
