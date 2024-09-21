@@ -3,5 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MainController;
 
-Route::get('/{any}', [MainController::class, 'index'])->where('any', '.*');
+Route::get('/{path}', [MainController::class, 'index'])->where('path', '^(?!api).*$');
+
 

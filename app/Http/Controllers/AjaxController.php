@@ -7,11 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use RoachPHP\Roach;
 
-class AjaxController extends Controller
-{
-    public function popularReleases(Request $request)
-    {
-        $page = (int) $request->input('page', 1);
+class AjaxController extends Controller {
+    public function popularReleases(Request $request) {
+        $page    = (int) $request->input('page', 1);
         $refresh = filter_var($request->input('refresh', false), FILTER_VALIDATE_BOOLEAN);
 
         $cacheKey = "ajaxcache:popular:$page";
@@ -21,10 +19,10 @@ class AjaxController extends Controller
                 GogoAjaxSpider::class,
                 context: [
                     'uri' => 'https://' . config('app.urls.ajax') . "/ajax/page-recent-release-ongoing.html?page=$page"
-                ]
+                ],
             );
             return array_merge(
-                ...array_map(fn($item) => $item->all(), $items)
+                ...array_map(fn($item) => $item->all(), $items),
             );
         };
 
