@@ -25,7 +25,7 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
 
     public function __construct(string $id, string $titleId)
     {
-        $this->id = $id;
+        $this->id      = $id;
         $this->titleId = $titleId;
     }
 
@@ -46,8 +46,8 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
         $results = $this->collectSpiderResults();
 
         if (isset($results['error'])) {
-            // Log::warning('Episode Job discarded', ['id' => $this->id, 'reason' => $results['error']]);
-            throw new Exception("{$results['error']}", 1);
+            Log::warning('Episode Job discarded', ['id' => $this->id, 'reason' => $results['error']]);
+            // throw new Exception("{$results['error']}", 1);
         }
 
         $episodeData = $this->processResults($results);
@@ -58,15 +58,15 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
 
     private function collectSpiderResults(): array
     {
-        $items = Roach::collectSpider(VidstreamVideoSpider::class, context: [
+        $items   = Roach::collectSpider(VidstreamVideoSpider::class, context: [
             'base_url' => config('app.urls.vidstream'),
-            'id' => $this->id
+            'id'       => $this->id
         ]);
         $results = array_merge(...array_map(fn($item) => $item->all(), $items));
 
         Log::debug('Spider collected', [
             'episode_id' => $this->id,
-            'results' => $results
+            'results'    => $results
         ]);
 
         return $results;
@@ -75,24 +75,25 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
     private function processResults(array $results): array
     {
         $episodeId = trim($results['episode_id'] ?? '');
-        $titleId = $this->titleId;
+        $titleId   = $this->titleId;
 
         $episodes = $results['episodes'] ?? [];
-        $meta = $this->findEpisodeMeta($episodes, $episodeId);
+        $meta     = $this->findEpisodeMeta($episodes, $episodeId);
 
         if (!$episodeId || !$titleId) {
-            throw new \Exception("Invalid episode or title ID");
+            Log::warning('Invalid episode or title ID', ['episode_id' => $episodeId, 'title_id' => $titleId]);
+            // throw new Exception("Invalid episode or title ID");
         }
 
         Log::debug('Results processed', ['episodeId' => $episodeId, 'titleId' => $titleId]);
 
         return [
-            'id' => $episodeId,
+            'id'            => $episodeId,
             'episode_index' => explode('episode-', $episodeId)[1] ?? null,
-            'download_url' => $results['download_url'] ?? null,
-            'title_id' => $titleId,
-            'upload_date' => $meta['date_added'] ?? null,
-            'video' => $results['stream_data'] ?? null,
+            'download_url'  => $results['download_url'] ?? null,
+            'title_id'      => $titleId,
+            'upload_date'   => $meta['date_added'] ?? null,
+            'video'         => $results['stream_data'] ?? null,
         ];
     }
 
