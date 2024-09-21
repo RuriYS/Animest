@@ -11,7 +11,7 @@ interface FooterLinkProps {
 }
 
 const FooterContainer = styled.footer`
-    ${tw`w-full mt-auto bg-black text-gray-400 p-4 flex justify-between`}
+    ${tw`w-full bg-black text-gray-400 p-4 flex justify-between`}
 `;
 
 const LinksContainer = styled.div`
