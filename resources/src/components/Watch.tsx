@@ -18,6 +18,29 @@ const WatchContainer = styled.div`
     ${tw`flex flex-col gap-y-8 w-full bg-black`}
 `;
 
+const InfoContainer = ({
+    header,
+    args,
+}: {
+    header: string;
+    args: string[];
+}) => (
+    <ContentContainer>
+        <Constraint>
+            <div className='flex flex-col gap-4'>
+                <h1 className='text-lg'>{header}</h1>
+                <span>
+                    {args.map((v, i) => (
+                        <p key={Math.random() * 1000} className='muted'>
+                            {v}
+                        </p>
+                    ))}
+                </span>
+            </div>
+        </Constraint>
+    </ContentContainer>
+);
+
 export default function Watch() {
     const navigate = useNavigate();
     const { id, episodeIndex } = useParams<{
@@ -67,7 +90,7 @@ export default function Watch() {
     }, [episodes, sortMode]);
 
     const currentEpisode = useMemo(
-        () => sortedEpisodes?.find((ep) => ep.episode_index === episodeIndex),
+        () => sortedEpisodes?.find((ep) => ep.episode_index == episodeIndex),
         [sortedEpisodes, episodeIndex],
     );
 
@@ -92,26 +115,28 @@ export default function Watch() {
     }, []);
 
     if (loading) return <WatchLoading />;
+
     if (error)
         return (
-            <ContentContainer>
-                <Constraint>
-                    <div className='flex flex-col gap-4'>
-                        <h1 className='text-lg'>{`The resource doesn't seem to exist :(`}</h1>
-                        <span>
-                            <p className='muted'>
-                                If you think that this is a mistake, please
-                                contact the developers.
-                            </p>
-                            <p className='muted'>
-                                Error message: "{error.message}"
-                            </p>
-                        </span>
-                    </div>
-                </Constraint>
-            </ContentContainer>
+            <InfoContainer
+                header="The resource doesn't seem to exist"
+                args={[`Error message: "${error.message}"`]}
+            />
         );
-    if (!meta || !sortedEpisodes || !currentEpisode) return null;
+
+    if (!meta || !sortedEpisodes || !currentEpisode) {
+        return (
+            <InfoContainer
+                header="We couldn't display this episode"
+                args={[
+                    'Try reloading your browser.',
+                    `Metadata: ${!!meta}`,
+                    `Episodes: ${!!sortedEpisodes}`,
+                    `Episode: ${!!currentEpisode}`,
+                ]}
+            />
+        );
+    }
 
     const indexOfLastEpisode = currentPage * episodesPerPage;
     const indexOfFirstEpisode = indexOfLastEpisode - episodesPerPage;
