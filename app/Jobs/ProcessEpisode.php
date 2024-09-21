@@ -16,31 +16,26 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use RoachPHP\Roach;
 
-class ProcessEpisode implements ShouldQueue, ShouldBeUnique
-{
+class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected string $id;
     protected string $titleId;
 
-    public function __construct(string $id, string $titleId)
-    {
+    public function __construct(string $id, string $titleId) {
         $this->id      = $id;
         $this->titleId = $titleId;
     }
 
-    public function uniqueId(): string
-    {
+    public function uniqueId(): string {
         return "{$this->id}_{$this->titleId}";
     }
 
-    public function uniqueFor(): int
-    {
+    public function uniqueFor(): int {
         return 3600;
     }
 
-    public function handle()
-    {
+    public function handle() {
         Log::debug('Processing Episode', ['id' => $this->id, 'title_id' => $this->titleId]);
 
         $results = $this->collectSpiderResults();
@@ -56,24 +51,22 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
         $this->createOrUpdateEpisode($episodeData);
     }
 
-    private function collectSpiderResults(): array
-    {
+    private function collectSpiderResults(): array {
         $items   = Roach::collectSpider(VidstreamVideoSpider::class, context: [
             'base_url' => config('app.urls.vidstream'),
-            'id'       => $this->id
+            'id'       => $this->id,
         ]);
         $results = array_merge(...array_map(fn($item) => $item->all(), $items));
 
         Log::debug('Spider collected', [
             'episode_id' => $this->id,
-            'results'    => $results
+            'results'    => $results,
         ]);
 
         return $results;
     }
 
-    private function processResults(array $results): array
-    {
+    private function processResults(array $results): array {
         $episodeId = trim($results['episode_id'] ?? '');
         $titleId   = $this->titleId;
 
@@ -97,27 +90,24 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique
         ];
     }
 
-    private function findEpisodeMeta(array $episodes, string $episodeId): ?array
-    {
+    private function findEpisodeMeta(array $episodes, string $episodeId): ?array {
         $filtered = array_values(array_filter($episodes, function ($item) use ($episodeId) {
             return $item['episode_id'] == $episodeId;
         }));
         return $filtered ? $filtered[0] : null;
     }
 
-    private function ensureTitleExists(string $titleId): void
-    {
+    private function ensureTitleExists(string $titleId): void {
         if (!Title::where('id', $titleId)->exists()) {
             Log::debug('Title not found, creating new Title', ['titleId' => $titleId]);
             ProcessTitle::dispatchSync($titleId);
         }
     }
 
-    private function createOrUpdateEpisode(array $episodeData): void
-    {
+    private function createOrUpdateEpisode(array $episodeData): void {
         $episode = Episode::updateOrCreate(
             ['id' => $episodeData['id']],
-            $episodeData
+            $episodeData,
         );
         Log::debug('Episode updated', ['id' => $episode->id]);
     }

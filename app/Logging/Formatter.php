@@ -7,16 +7,14 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Processor\IntrospectionProcessor;
 use Monolog\Logger as MonologLogger;
 
-class Formatter
-{
-    public function __invoke(Logger $logger): void
-    {
+class Formatter {
+    public function __invoke(Logger $logger): void {
         foreach ($logger->getHandlers() as $handler) {
             $lineFormatter = new LineFormatter(
                 "[%datetime%] %level_name%: %message% %context% %extra%\n",
                 'H:i:s',
                 true,
-                true
+                true,
             );
 
             $lineFormatter->includeStacktraces(true);
@@ -25,7 +23,7 @@ class Formatter
 
             $handler->pushProcessor(new IntrospectionProcessor(
                 MonologLogger::DEBUG,
-                ['Illuminate\\']
+                ['Illuminate\\'],
             ));
 
             $handler->pushProcessor(function ($record) {

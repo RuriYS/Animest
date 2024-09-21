@@ -30,33 +30,30 @@ use RoachPHP\Downloader\Middleware\UserAgentMiddleware;
  |-------------------------------------------------------------------------------------------------------------------
  */
 
-class GogoSpider extends BasicSpider
-{
-    protected function initialRequests(): array
-    {
+class GogoSpider extends BasicSpider {
+    protected function initialRequests(): array {
         return [
             new Request(
                 method: 'GET',
                 uri: $this->context['uri'],
-                parseMethod: [$this, 'parse']
-            )
+                parseMethod: [$this, 'parse'],
+            ),
         ];
     }
 
     public array $downloaderMiddleware = [
         [
             UserAgentMiddleware::class,
-            ['userAgent' => "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"]
+            ['userAgent' => "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"],
         ],
     ];
 
-    public array $extensions = [];
+    public array $extensions     = [];
     public array $itemProcessors = [
-        GogoProcessor::class
+        GogoProcessor::class,
     ];
-    public function parse(Response $response): Generator
-    {
-        $path = parse_url($response->getUri(), PHP_URL_PATH);
+    public function parse(Response $response): Generator {
+        $path  = parse_url($response->getUri(), PHP_URL_PATH);
         $paths = array_filter(explode("/", $path));
 
         if ($response->getStatus() === 200 && isset($paths[1])) {
@@ -75,21 +72,20 @@ class GogoSpider extends BasicSpider
             }
         } else {
             yield $this->item([
-                'error' => 'Invalid Request'
+                'error' => 'Invalid Request',
             ]);
         }
     }
 
-    public function parseCategory(Response $response, string $id): Generator
-    {
+    public function parseCategory(Response $response, string $id): Generator {
         $paginationNode = $response->filter('#episode_page > li:nth-child(1) > a');
 
         $paginationData = [
-            'paginationId' => $response->filter('input#movie_id')->first()?->attr('value'),
-            'paginationAlias' => $response->filter('input#alias_anime')->first()?->attr('value'),
+            'paginationId'           => $response->filter('input#movie_id')->first()?->attr('value'),
+            'paginationAlias'        => $response->filter('input#alias_anime')->first()?->attr('value'),
             'paginationDefaultIndex' => $response->filter('input#default_ep')->first()?->attr('value'),
-            'paginationStart' => $paginationNode?->attr('ep_start'),
-            'paginationEnd' => $paginationNode?->attr('ep_end'),
+            'paginationStart'        => $paginationNode?->attr('ep_start'),
+            'paginationEnd'          => $paginationNode?->attr('ep_end'),
         ];
 
         if (in_array(null, array_keys($paginationData))) {
@@ -97,35 +93,34 @@ class GogoSpider extends BasicSpider
         }
 
         $params = http_build_query([
-            'ep_start' => $paginationData['paginationStart'],
-            'ep_end' => $paginationData['paginationEnd'],
-            'id' => $paginationData['paginationId'],
+            'ep_start'   => $paginationData['paginationStart'],
+            'ep_end'     => $paginationData['paginationEnd'],
+            'id'         => $paginationData['paginationId'],
             'default_ep' => $paginationData['paginationDefaultIndex'],
-            'alias' => $paginationData['paginationAlias']
+            'alias'      => $paginationData['paginationAlias'],
         ]);
 
         yield $this->request('GET', "https://ajax.gogocdn.net/ajax/load-list-episode?$params", 'parseEpisodeList');
 
         $items = [
             'description' => $response->filter('.anime_info_body_bg .description')->text(),
-            'length' => intval($response->filter('#episode_page a')->last()->attr('ep_end')),
-            'genres' => $response->filter('.anime_info_body_bg p.type:nth-child(7) a')->each(fn(Crawler $node) => trim(preg_replace('/[,]/', '', $node->text()))),
-            'id' => $id,
-            'language' => str_ends_with($id, '-dub') ? 'dub' : 'sub',
-            'names' => $response->filter('.anime_info_body_bg p.type:nth-child(10) a')->text(),
-            'origin' => null,
-            'season' => CateParser::parseSeason($response->filter('.anime_info_body_bg p.type:nth-child(4) a')->attr('href')),
-            'splash' => $response->filter('.anime_info_body_bg img')->attr('src'),
-            'status' => $response->filter('.anime_info_body_bg p.type:nth-child(9) a')->text(),
-            'title' => $response->filter('.anime_info_body_bg h1')->text(),
-            'year' => $response->filter('.anime_info_body_bg p.type:nth-child(8)')->innerText(),
+            'length'      => intval($response->filter('#episode_page a')->last()->attr('ep_end')),
+            'genres'      => $response->filter('.anime_info_body_bg p.type:nth-child(7) a')->each(fn(Crawler $node) => trim(preg_replace('/[,]/', '', $node->text()))),
+            'id'          => $id,
+            'language'    => str_ends_with($id, '-dub') ? 'dub' : 'sub',
+            'names'       => $response->filter('.anime_info_body_bg p.type:nth-child(10) a')->text(),
+            'origin'      => null,
+            'season'      => CateParser::parseSeason($response->filter('.anime_info_body_bg p.type:nth-child(4) a')->attr('href')),
+            'splash'      => $response->filter('.anime_info_body_bg img')->attr('src'),
+            'status'      => $response->filter('.anime_info_body_bg p.type:nth-child(9) a')->text(),
+            'title'       => $response->filter('.anime_info_body_bg h1')->text(),
+            'year'        => $response->filter('.anime_info_body_bg p.type:nth-child(8)')->innerText(),
         ];
 
         yield $this->item($items);
     }
 
-    public function parseFilterResults(Response $response): Generator
-    {
+    public function parseFilterResults(Response $response): Generator {
         $items = $response->filter('.items li')->each(
             function (Crawler $node) {
                 $releasedNode = $node->filter('.released');
@@ -135,8 +130,8 @@ class GogoSpider extends BasicSpider
                 return [
                     'image' => $node->filter('.img img')->attr('src'),
                     'title' => $node->filter('.name a[title]')->text(),
-                    'id' => explode('/', $node->filter('.name a[href]')->attr('href'))[2],
-                    'year' => $year,
+                    'id'    => explode('/', $node->filter('.name a[href]')->attr('href'))[2],
+                    'year'  => $year,
                 ];
             }
         );
@@ -144,8 +139,7 @@ class GogoSpider extends BasicSpider
         yield $this->item($items);
     }
 
-    public function parseEpisodeList(Response $response): Generator
-    {
+    public function parseEpisodeList(Response $response): Generator {
         // file_put_contents(public_path('episode_list.html'), $response->html());
 
         $href = $response->filter('#episode_related a')->attr('href');
@@ -158,7 +152,7 @@ class GogoSpider extends BasicSpider
         } else {
             Log::warning("Could not extract alias ID: $href");
             yield $this->item([
-                'alias' => null
+                'alias' => null,
             ]);
         }
     }

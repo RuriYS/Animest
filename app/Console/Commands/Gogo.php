@@ -7,20 +7,18 @@ use App\Spiders\GogoSpider;
 use Illuminate\Console\Command;
 use RoachPHP\Roach;
 
-class Gogo extends Command
-{
+class Gogo extends Command {
     protected $signature = 'scraper:gogo {uri}';
 
     protected $description = 'Gogo scraper';
 
-    public function handle()
-    {
+    public function handle() {
         $uri = $this->argument('uri');
         $this->info('GogoScraper started with URI: ' . $uri);
 
         $results = Roach::collectSpider(
             GogoSpider::class,
-            context: ['uri' => $uri]
+            context: ['uri' => $uri],
         );
 
         $result = array_map(fn($item) => $item->all(), $results);

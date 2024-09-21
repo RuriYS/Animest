@@ -7,22 +7,19 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
-{
-    public function register(): void
-    {
+class AppServiceProvider extends ServiceProvider {
+    public function register(): void {
         $this->app->singleton(Client::class, function ($app) {
             return new Client([
                 'User-Agent' => config('app.user_agent'),
-                'timeout' => 5.0,
+                'timeout'    => 5.0,
             ]);
         });
     }
 
-    public function boot(): void
-    {
+    public function boot(): void {
         RateLimiter::for('proxy', function ($request) {
-            return Limit::perMinute(maxAttempts: 120)->by($request->ip()); 
+            return Limit::perMinute(maxAttempts: 120)->by($request->ip());
         });
     }
 }

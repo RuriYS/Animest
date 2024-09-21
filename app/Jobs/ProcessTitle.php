@@ -14,8 +14,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use RoachPHP\Roach;
 
-class ProcessTitle implements ShouldQueue, ShouldBeUnique
-{
+class ProcessTitle implements ShouldQueue, ShouldBeUnique {
     use Dispatchable, InteractsWithQueue, SerializesModels;
 
     protected string $id;
@@ -23,24 +22,20 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
     protected bool $processEps;
 
 
-    public function __construct(string $id, bool $processEps = true)
-    {
-        $this->id = $id;
+    public function __construct(string $id, bool $processEps = true) {
+        $this->id         = $id;
         $this->processEps = $processEps;
     }
 
-    public function uniqueId(): string
-    {
+    public function uniqueId(): string {
         return $this->id;
     }
 
-    public function uniqueFor(): int
-    {
+    public function uniqueFor(): int {
         return 3600;
     }
 
-    public function handle(): void
-    {
+    public function handle(): void {
         $id = str($this->id)->toString();
         Log::debug('Processing Title', ['id' => $id]);
 
@@ -64,13 +59,12 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
         }
     }
 
-    private function collectSpider(string $id): array
-    {
+    private function collectSpider(string $id): array {
         $items = Roach::collectSpider(
             GogoSpider::class,
             context: [
                 'uri' => 'https://' . config('app.urls.gogo') . "/category/$id"
-            ]
+            ],
         );
 
         $result = array_merge(...array_map(fn($item) => $item->all(), $items));
@@ -78,17 +72,15 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
         return $result;
     }
 
-    private function updateTitle(array $result): Title
-    {
+    private function updateTitle(array $result): Title {
         $titleData = array_diff_key($result, array_flip(['genres']));
-        $title = Title::updateOrCreate(['id' => $result['id']], $titleData);
+        $title     = Title::updateOrCreate(['id' => $result['id']], $titleData);
 
         Log::debug('Title updated', ['id' => $title->id]);
         return $title;
     }
 
-    private function processGenres(array $genres, Title $title): void
-    {
+    private function processGenres(array $genres, Title $title): void {
         $genres = array_map('trim', $genres);
         Log::debug("Processing genres", ['titleId' => $title->id, 'genreCount' => count($genres)]);
 
@@ -106,8 +98,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique
         }
     }
 
-    private function processEpisodes(string $alias, int $length): void
-    {
+    private function processEpisodes(string $alias, int $length): void {
         $existingEpisodes = Episode::where('title_id', $alias)
             ->pluck('episode_index')
             ->toArray();

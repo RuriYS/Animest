@@ -6,13 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Title extends Model
-{
+class Title extends Model {
     public $incrementing = false;
 
-    protected $table = 'titles';
+    protected $table      = 'titles';
     protected $primaryKey = 'id';
-    protected $keyType = 'string';
+    protected $keyType    = 'string';
 
     protected $fillable = [
         'alias',
@@ -30,32 +29,30 @@ class Title extends Model
     ];
 
     protected $casts = [
-        'alias' => 'string',
+        'alias'       => 'string',
         'description' => 'string',
-        'id' => 'string',
-        'language' => 'string',
-        'length' => 'integer',
-        'names' => 'string',
-        'origin' => 'string',
-        'season' => 'string',
-        'splash' => 'string',
-        'status' => 'string',
-        'title' => 'string',
-        'year' => 'string',
+        'id'          => 'string',
+        'language'    => 'string',
+        'length'      => 'integer',
+        'names'       => 'string',
+        'origin'      => 'string',
+        'season'      => 'string',
+        'splash'      => 'string',
+        'status'      => 'string',
+        'title'       => 'string',
+        'year'        => 'string',
     ];
 
-    public function episodes(): HasMany
-    {
+    public function episodes(): HasMany {
         return $this->hasMany(Episode::class);
     }
 
-    public function genres(): BelongsToMany
-    {
+    public function genres(): BelongsToMany {
         return $this->belongsToMany(
             Genre::class,
             'title_genre',
             'title_id',
-            'genre_id'
+            'genre_id',
         )->using(TitleGenre::class);
     }
 }

@@ -6,13 +6,11 @@ use DateTime;
 use DateTimeZone;
 use Log;
 
-class Dateparser
-{
-    public function parseDate(string $date): string
-    {
+class Dateparser {
+    public function parseDate(string $date): string {
         if (preg_match('/\bago\b/', $date)) {
             $timestamp = strtotime($date);
-            $utcDate = new DateTime("@$timestamp");
+            $utcDate   = new DateTime("@$timestamp");
             $utcDate->setTimezone(new DateTimeZone('PST'));
             return $utcDate->format('Y-m-d H:i:s');
         } else {
