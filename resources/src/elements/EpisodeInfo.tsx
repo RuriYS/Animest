@@ -22,17 +22,17 @@ const EpisodeInfo: React.FC<EpisodeInfoProps> = ({
             </h2>
         </div>
         <div className='flex-1 flex-col lg:flex gap-4 p-4 bg-neutral-900 rounded-lg'>
-            <div className='flex gap-4'>
+            <div className='flex gap-2'>
                 <p className='flex gap-1 text-sm'>
                     <span>{views <= 0 ? 'No' : views}</span>
-                    <span className='text-gray-300'>
+                    <span className='muted'>
                         view{views > 1 || views == 0 ? 's' : ''}
                     </span>
                 </p>
                 <Moment uploadDate={episode?.upload_date} className='text-sm' />
             </div>
-            <p className='text-sm text-gray-500'>{meta.names}</p>
-            <p className='text-xs text-gray-500'>{meta.description}</p>
+            <p className='text-sm muted'>{meta.names}</p>
+            <p className='text-xs muted'>{meta.description}</p>
         </div>
     </div>
 );

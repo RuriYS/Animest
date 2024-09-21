@@ -126,7 +126,7 @@ export default function Watch() {
             <WatchContainer>
                 <PlayerWrapper
                     src={currentEpisode.video.source[0].file}
-                    title={meta.title}
+                    title={`${meta.title} · Episode ${currentEpisode.episode_index}`}
                     onEnd={handleEpisodeEnd}
                 />
                 <div className='grid px-2 gap-2 lg:grid-cols-2 lg:px-8 lg:gap-4'>
