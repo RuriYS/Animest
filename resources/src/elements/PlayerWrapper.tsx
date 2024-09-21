@@ -28,10 +28,10 @@ interface MediaPlayerWrapperProps {
 
 const config: Partial<HlsConfig> = {
     autoStartLoad: true,
-    debug: true,
-    maxBufferLength: 5,
-    maxMaxBufferLength: 5,
-    maxBufferSize: 1 * 1000 * 1000,
+    debug: false,
+    maxBufferLength: 60,
+    maxMaxBufferLength: 600,
+    maxBufferSize: 10 * 1000 * 1000,
     maxBufferHole: 0.5,
     lowLatencyMode: true,
     highBufferWatchdogPeriod: 1,
@@ -45,7 +45,7 @@ const config: Partial<HlsConfig> = {
     fragLoadingRetryDelay: 1000,
     fragLoadingMaxRetryTimeout: 5000,
     startFragPrefetch: false,
-    progressive: false,
+    progressive: true,
     abrEwmaDefaultEstimate: 500000,
     abrEwmaFastLive: 3,
     abrEwmaSlowLive: 9,
@@ -86,7 +86,7 @@ const PlayerWrapper: React.FC<MediaPlayerWrapperProps> = ({
             ref={playerRef}
             onEnd={onEnd}
             title={title}
-            src={`/api/proxy/${uri.host}${uri.pathname}`}
+            src={`/proxy/${uri}`}
             playsInline
             onProviderChange={onProviderChange}
         >
