@@ -29,8 +29,7 @@ interface MediaPlayerWrapperProps {
 const config: Partial<HlsConfig> = {
     autoStartLoad: true,
     debug: false,
-    maxBufferLength: 60,
-    maxMaxBufferLength: 600,
+    maxBufferLength: 30,
     maxBufferSize: 10 * 1000 * 1000,
     maxBufferHole: 0.5,
     lowLatencyMode: true,
