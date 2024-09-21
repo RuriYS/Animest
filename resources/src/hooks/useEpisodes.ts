@@ -20,7 +20,7 @@ function useInterval(callback: () => void, delay: number | null) {
     }, [delay]);
 }
 
-export default function useEpisodesAndMeta(id: string) {
+export default function Hook(id: string) {
     const [state, setState] = useState({
         loading: true,
         episodes: null as EpisodeProps[] | null,
@@ -32,7 +32,7 @@ export default function useEpisodesAndMeta(id: string) {
 
     const fetchEpisodes = useCallback(async () => {
         try {
-            const { data } = await axios.get(`/api/videos/${id}`);
+            const { data } = await axios.get(`/api/episodes/${id}`);
             if (data.exists) {
                 setState((prev) => ({
                     ...prev,
