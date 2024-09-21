@@ -18,30 +18,28 @@ Route::prefix('/spider')
             });
     });
 
-Route::prefix('/videos')
+Route::prefix('/episodes')
     ->group(function () {
-        Route::get('/{anime_id}', [EpisodeController::class, 'index']);
-        Route::get('/{anime_id}/{index}', [EpisodeController::class, 'show']);
-        Route::post('/{anime_id}/{index}', [EpisodeController::class, 'view']);
-        Route::get('/{anime_id}/{index}/process', [EpisodeController::class, 'process']);
+        Route::get('/{title_id}', [EpisodeController::class, 'index']);
+        Route::get('/{title_id}/{index}', [EpisodeController::class, 'show']);
+        Route::post('/{title_id}/{index}', [EpisodeController::class, 'view']);
+        Route::get('/{title_id}/{index}/process', [EpisodeController::class, 'process']);
     });
 
 Route::prefix('/titles')
     ->group(function () {
         Route::get('/', [TitleController::class, 'search']);
-        Route::get('/{id}', [TitleController::class, 'show']);
-        Route::get('/{id}/process', [TitleController::class, 'process']);
+        Route::get('/{title_id}', [TitleController::class, 'show']);
+        Route::get('/{title_id}/process', [TitleController::class, 'process']);
     });
 
 Route::prefix('/search')
     ->group(function () {
-        Route::get('/{params?}', [SearchController::class, 'search'])->where('params', '.*');
-        Route::get('/quick/{params?}', [SearchController::class, 'quicksearch'])->where('params', '.*');
+        Route::get('/{params?}', [SearchController::class, 'search'])
+            ->where('params', '.*');
+        Route::get('/quick/{params?}', [SearchController::class, 'quicksearch'])
+            ->where('params', '.*');
     });
-
-Route::get('/proxy/{uri}', [ProxyController::class, 'proxy'])
-    ->where('uri', '.*')
-    ->middleware('throttle:proxy');
 
 Route::prefix('/ajax')
     ->group(function () {

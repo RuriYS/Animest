@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessTitle;
 use App\Models\Title;
 
-class TitleController extends Controller {
+class TitleController extends ControllerAbstract {
     public function show(string $id) {
         $title = Title::find($id);
 
@@ -15,16 +15,9 @@ class TitleController extends Controller {
         }
 
         return response()->json([
-            'errors' => $title ? null : 'Title not found, it\'s either invalid or doesn\'t exist',
+            'errors' => $title ? null : "Title not found, it's either invalid or doesn't exist",
             'query'  => $id,
             'result' => $title?->toArray(),
-        ]);
-    }
-
-    public function process(string $id) {
-        ProcessTitle::dispatchSync($id);
-        return response()->json([
-            'message' => 'Job dispatched',
         ]);
     }
 }

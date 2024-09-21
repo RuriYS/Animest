@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\ControllerAbstract;
 
-class MainController extends Controller {
+class MainController extends ControllerAbstract {
     public function index() {
         return view('home');
-    }
-
-    public function test() {
-        return response('Hi', 200);
     }
 }

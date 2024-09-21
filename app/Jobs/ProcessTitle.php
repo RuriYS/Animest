@@ -76,7 +76,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
         $titleData = array_diff_key($result, array_flip(['genres']));
         $title     = Title::updateOrCreate(['id' => $result['id']], $titleData);
 
-        Log::debug('Title updated', ['id' => $title->id]);
+        Log::debug('Title updated', ['id' => $title->episode_id]);
         return $title;
     }
 

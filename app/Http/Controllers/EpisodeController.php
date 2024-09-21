@@ -6,36 +6,52 @@ use App\Jobs\ProcessEpisode;
 use App\Jobs\ProcessTitle;
 use App\Models\Episode;
 
-class EpisodeController extends Controller {
+class EpisodeController extends ControllerAbstract {
     protected string $error = '';
 
     public function index(string $title_id) {
-        $episodes = Episode::where('title_id', $title_id)->get();
+        $episodes = Episode::where(
+            'title_id',
+            $title_id,
+        )->get();
 
+        // If there are no episodes, process the Title
         if ($episodes->isEmpty()) {
-            ProcessTitle::dispatchSync($title_id, true);
+            ProcessTitle::dispatchSync(
+                $title_id,
+                true,
+            );
         }
 
-        return response()->json([
-            'query'    => $title_id,
-            'exists'   => $episodes->isNotEmpty(),
-            'episodes' => $episodes,
-        ]);
+        return response()->json(
+            [
+                'query'    => $title_id,
+                'exists'   => $episodes->isNotEmpty(),
+                'episodes' => $episodes,
+            ],
+        );
     }
 
     public function show(string $title_id, string $index) {
-        $episodeIdFormats = [
+        $id_formats = [
             "{$title_id}-episode-{$index}",
             "{$title_id}-{$index}",
         ];
 
         // Try finding the episode using both formats
-        $episode = Episode::whereIn('id', $episodeIdFormats)->first();
+        $episode = Episode::whereIn(
+            'id',
+            $id_formats,
+        )->first();
 
-        // If episode doesn't exist, process it and retry fetching
+        // If it doesn't exist, process it & retry
         if (!$episode && $title_id && $index) {
-            ProcessEpisode::dispatchSync($episodeIdFormats[0], $title_id);
-            $episode = Episode::find($episodeIdFormats[0]);
+            ProcessEpisode::dispatchSync(
+                $id_formats[0],
+                $title_id,
+            );
+
+            $episode = Episode::find($id_formats[0]);
 
             if (!$episode) {
                 $this->error = 'Episode not found';
@@ -47,28 +63,7 @@ class EpisodeController extends Controller {
             'index'   => $index,
             'exists'  => (bool) $episode,
             'episode' => $episode,
-            'errors'  => $this->error ?? null
+            'errors'  => (string) $this->error ?? null
         ]);
     }
-
-    public function view(string $anime_id, string $index) {
-        $episodeIdFormats = [
-            "{$anime_id}-episode-{$index}",
-            "{$anime_id}-{$index}",
-        ];
-
-        $episode = Episode::find($episodeIdFormats[0]) ?? Episode::find($episodeIdFormats[1]);
-        $episode->save();
-        return response($episode->views, 200);
-    }
-
-    // public function process(string $anime_id, string $index)
-    // {
-    //     $id = "$anime_id-episode-$index";
-    //     ProcessEpisode::dispatch($id);
-    //     return response()->json([
-    //         'query' => $id,
-    //         'message' => 'Job dispatched'
-    //     ]);
-    // }
 }
