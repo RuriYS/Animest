@@ -69,7 +69,8 @@ export default function Section({ category, header, maxpage = 5 }: Props) {
     };
 
     const parseEpisodeId = (str: string) => {
-        return str.split('-episode-');
+        const re = /([^\/]*?)-episode-(\d+)$/.exec(str);
+        return [re ? re[1] : null, re ? re[2] : null];
     };
 
     return (
@@ -90,7 +91,7 @@ export default function Section({ category, header, maxpage = 5 }: Props) {
                         >
                             {titles &&
                                 titles.map((item) => {
-                                    const [titleId, episodeIndex] =
+                                    const [alias, episode_index] =
                                         parseEpisodeId(item.latest_episode_id);
 
                                     const genres = item.genres.map(
@@ -104,7 +105,7 @@ export default function Section({ category, header, maxpage = 5 }: Props) {
                                             className='relative flex-none w-[32%] sm:w-[23%] md:w-[18%] lg:w-[15%] xl:w-[12%] cursor-pointer group/item'
                                             onClick={() =>
                                                 navigate(
-                                                    `/watch/${titleId}/episode/${episodeIndex}`,
+                                                    `/watch/${item.id}/episode/${episode_index}`,
                                                 )
                                             }
                                         >
@@ -134,7 +135,7 @@ export default function Section({ category, header, maxpage = 5 }: Props) {
                                                                 className='w-full bg-white text-black hover:bg-white/90 text-xs sm:text-sm'
                                                             >
                                                                 <Link
-                                                                    to={`/watch/${titleId}/episode/${episodeIndex}`}
+                                                                    to={`/watch/${item.id}/episode/${episode_index}`}
                                                                     className='text-black flex'
                                                                 >
                                                                     <Play className='mr-1 h-3 w-3 sm:h-4 sm:w-4' />
