@@ -11,7 +11,7 @@ class TitleController extends ControllerAbstract {
         $title = Title::with('genres')->find($id);
 
         if (!$title) {
-            ProcessTitle::dispatchSync($id, false);
+            ProcessTitle::dispatchSync($id);
             $title = Title::with('genres')->find($id);
         }
 
@@ -23,7 +23,7 @@ class TitleController extends ControllerAbstract {
     }
 
     public function process(Request $request, string $id) {
-        $process_eps = $request->boolean('eps', false);
+        $process_eps = $request->boolean('eps', true);
         $refresh_eps = $request->boolean('refresh_eps', true);
 
         ProcessTitle::dispatch($id, $process_eps, $refresh_eps);

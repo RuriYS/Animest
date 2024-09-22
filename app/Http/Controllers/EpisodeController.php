@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessEpisode;
 use App\Jobs\ProcessTitle;
 use App\Models\Episode;
+use App\Utils\CateParser;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class EpisodeController extends ControllerAbstract {
     protected string $error = '';
@@ -15,12 +18,8 @@ class EpisodeController extends ControllerAbstract {
             $title_id,
         )->get();
 
-        // If there are no episodes, process the Title
         if ($episodes->isEmpty()) {
-            ProcessTitle::dispatchSync(
-                $title_id,
-                true,
-            );
+            ProcessTitle::dispatchSync($title_id);
         }
 
         return response()->json(
@@ -65,5 +64,18 @@ class EpisodeController extends ControllerAbstract {
             'episode' => $episode,
             'errors'  => (string) $this->error ?? null
         ]);
+    }
+
+    // Utils endpoints
+
+    public function parseEpisodeId(Request $request) {
+        $input = $request->input('i');
+        $key   = "episodeid_parser:$input";
+
+        if ($input) {
+            Cache::remember($key, now()->addHours(4), function () use ($input) {
+                return CateParser::parseEpisodeID(trim($input));
+            });
+        }
     }
 }

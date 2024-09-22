@@ -36,7 +36,7 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
     }
 
     public function uniqueId(): string {
-        return "{$this->episode_id}_{$this->title_id}";
+        return md5("{$this->episode_id}_{$this->title_id}");
     }
 
     public function uniqueFor(): int {

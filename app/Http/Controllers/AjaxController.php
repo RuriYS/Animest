@@ -14,12 +14,9 @@ class AjaxController extends ControllerAbstract {
             1,
         );
 
-        $refresh = filter_var(
-            $request->input(
-                'refresh',
-                false,
-            ),
-            FILTER_VALIDATE_BOOLEAN,
+        $refresh = $request->boolean(
+            'refresh',
+            false,
         );
 
         $cacheKey = "ajaxcache:popular:$page";

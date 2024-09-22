@@ -23,7 +23,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
 
     protected bool $refresh_eps;
 
-    public function __construct(string $title_id, bool $process_eps = true, bool $refresh_eps) {
+    public function __construct(string $title_id, bool $process_eps = true, bool $refresh_eps = true) {
         $this->title_id    = $title_id;
         $this->process_eps = $process_eps;
         $this->refresh_eps = $refresh_eps;
@@ -113,13 +113,21 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
             ->pluck('episode_index')
             ->toArray();
 
-        $titleId         = $this->title_id;
+        $title_id        = $this->title_id;
         $dispatched_jobs = [];
 
         for ($i = 1; $i <= $length; $i++) {
             if ($this->refresh_eps === true || ($this->refresh_eps === false && !in_array($i, $cached_episodes))) {
-                $episodeId         = "{$alias}-episode-{$i}";
-                $dispatched_jobs[] = ProcessEpisode::dispatch($episodeId, $titleId)->onQueue('low');
+                $episode_id        = "{$alias}-episode-{$i}";
+                $dispatched_jobs[] = ProcessEpisode::dispatch($episode_id, $title_id)->onQueue('low');
+                Log::debug(
+                    '[ProcessTitle] Dispatched episode',
+                    [
+                        'alias'      => $alias,
+                        'episode_id' => $episode_id,
+                        'title_id'   => $title_id,
+                    ],
+                );
             }
         }
 
