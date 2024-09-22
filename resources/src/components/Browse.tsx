@@ -139,29 +139,30 @@ export default function Component() {
                                 <Button
                                     variant='outline'
                                     size='icon'
-                                    className='shrink-0 bg-transparent border-gray-700 hover:bg-neutral-300'
+                                    className='shrink-0 bg-transparent border-gray-700 hover:text-primary-foreground hover:bg-neutral-200'
                                 >
                                     <Sliders className='h-4 w-4' />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className='w-80 bg-neutral-300'>
+                            <PopoverContent className='w-64 bg-neutral-200'>
                                 <div className='grid gap-4'>
                                     <div className='space-y-2'>
-                                        <h4 className='text-black font-medium leading-none'>
+                                        <h4 className='text-primary-foreground leading-none'>
                                             Advanced Search
                                         </h4>
-                                        <p className='text-xs text-muted-foreground'>
+                                        <p className='text-xs text-primary-foreground opacity-80'>
                                             Configure your search parameters
                                         </p>
                                     </div>
                                     <div className='grid gap-2'>
                                         <div className='flex items-center space-x-2'>
                                             <Switch
+                                                className='bg-neutral-400'
                                                 id='exact-match'
                                                 checked={exactMatch}
                                                 onCheckedChange={setExactMatch}
                                             />
-                                            <Label htmlFor='exact-match'>
+                                            <Label htmlFor='exact-match text-sm'>
                                                 Exact match
                                             </Label>
                                         </div>
@@ -169,14 +170,6 @@ export default function Component() {
                                 </div>
                             </PopoverContent>
                         </Popover>
-                        <Button
-                            type='submit'
-                            className='shrink-0 bg-neutral-200 hover:bg-neutral-400 text-black'
-                            onClick={fetchResults}
-                        >
-                            <Search className='h-4 w-4 mr-2' />
-                            <span className='text-[0.8rem]'>Search</span>
-                        </Button>
                     </div>
                     {exactMatch && (
                         <div className='text-sm text-muted-foreground'>

@@ -1,4 +1,4 @@
-import Anime from './Anime';
+import Title from './Title';
 import Footer from './Footer';
 import Header from './Header';
 import Home from './Home';
@@ -11,7 +11,7 @@ import Section from './Section';
 import Watch from './Watch';
 
 export {
-    Anime,
+    Title as Anime,
     Footer,
     Header,
     Home,
