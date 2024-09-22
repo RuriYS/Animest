@@ -28,9 +28,9 @@ Route::prefix('/episodes')
 
 Route::prefix('/titles')
     ->group(function () {
-        Route::get('/', [TitleController::class, 'search']);
         Route::get('/{title_id}', [TitleController::class, 'show']);
-        Route::get('/{title_id}/process', [TitleController::class, 'process']);
+        Route::get('/{title_id}/process/{params?}', [TitleController::class, 'process'])
+            ->where('params', '.*');
     });
 
 Route::prefix('/search')
