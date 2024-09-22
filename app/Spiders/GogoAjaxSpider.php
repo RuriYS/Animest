@@ -57,7 +57,7 @@ class GogoAjaxSpider extends BasicSpider {
             return [
                 'id'                => Helper::parseTitleId($node->filter('a')->attr('href') ?? ''),
                 'genres'            => $node->filter('p.genres > a')->each(function (Crawler $subnode) {
-                    return Cateparser::parseGenre($subnode->attr('href') ?? '');
+                    return Helper::parseGenre($subnode->attr('href') ?? '');
                 }),
                 'latest_episode_id' => substr($node->filter('p:nth-of-type(2) > a')->attr('href'), 1),
                 'thumbnail'         => Helper::parseThumbnail($node->filter('.thumbnail-popular')->attr('style')),
