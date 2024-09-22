@@ -54,7 +54,7 @@ export default function Watch() {
 
     useEffect(() => {
         if (!episodeIndex) {
-            navigate(`/watch/${id}/episode/1`);
+            navigate(`/watch/${id}/episode/1`, { replace: true });
         }
     }, [id, episodeIndex, navigate]);
 
@@ -118,23 +118,27 @@ export default function Watch() {
 
     if (error)
         return (
-            <InfoContainer
-                header="The resource doesn't seem to exist"
-                args={[`Error message: "${error.message}"`]}
-            />
+            <Constraint>
+                <InfoContainer
+                    header="The resource doesn't seem to exist"
+                    args={[error.message]}
+                />
+            </Constraint>
         );
 
     if (!meta || !sortedEpisodes || !currentEpisode) {
         return (
-            <InfoContainer
-                header="We couldn't display this episode"
-                args={[
-                    'Try reloading your browser.',
-                    `Metadata: ${!!meta}`,
-                    `Episodes: ${!!sortedEpisodes}`,
-                    `Episode: ${!!currentEpisode}`,
-                ]}
-            />
+            <Constraint>
+                <InfoContainer
+                    header="We couldn't display this episode"
+                    args={[
+                        'Try reloading your browser.',
+                        `Metadata: ${!!meta}`,
+                        `Episodes: ${!!sortedEpisodes}`,
+                        `Episode: ${!!currentEpisode}`,
+                    ]}
+                />
+            </Constraint>
         );
     }
 
@@ -148,6 +152,7 @@ export default function Watch() {
 
     return (
         <Constraint>
+            <title>{meta.title} | Animest</title>
             <WatchContainer>
                 <PlayerWrapper
                     src={currentEpisode.video.source[0].file}

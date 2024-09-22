@@ -43,7 +43,7 @@ const Footer = () => {
                     </FooterLink>
                 </LinksContainer>
                 <SocialLinks>
-                    <FooterLink to='#'>
+                    <FooterLink to='https://discord.gg/ZFXA7Wf2Ra'>
                         <FaDiscord size={20} />
                     </FooterLink>
                 </SocialLinks>

@@ -19,6 +19,14 @@ interface MovieDetails {
     backgroundVideo?: string;
 }
 
+interface Result {
+    description: string;
+    genres: {
+        id: string;
+        name: string;
+    }[];
+}
+
 export default function SearchResult({ id, title, image, year }: Props) {
     const navigate = useNavigate();
     const [isExpanded, setIsExpanded] = useState(false);
@@ -30,10 +38,11 @@ export default function SearchResult({ id, title, image, year }: Props) {
     const fetchDetails = async () => {
         const { data } = await axios.get(`/api/titles/${id}`);
         if (data.result) {
-            const result = data.result;
+            const result: Result = data.result;
+            const genres = result.genres.map((v, index) => v.name);
             setDetails({
                 summary: result.description as string,
-                genres: ['Sci-Fi', 'Adventure', 'Drama'],
+                genres: genres,
             });
         }
     };

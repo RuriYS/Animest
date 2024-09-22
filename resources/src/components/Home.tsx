@@ -5,6 +5,7 @@ import Section from './Section';
 const Home = () => {
     return (
         <>
+            <title>Home | Animest</title>
             <FeaturedBanner />
             <Section category='popular' header='Top Airing' maxpage={5} />
         </>
