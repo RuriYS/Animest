@@ -156,9 +156,10 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
             ['id' => $episodeData['id']],
             $episodeData,
         );
+
         Log::debug(
             'Episode updated',
-            ['id' => $episode->episode_id],
+            ['id' => $episode->id],
         );
     }
 }
