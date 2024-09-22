@@ -4,7 +4,7 @@ namespace App\Spiders;
 
 use Exception;
 use Generator;
-use App\Utils\CateParser;
+use App\Utils\Helper;
 use RoachPHP\Http\Request;
 use RoachPHP\Http\Response;
 use RoachPHP\Spider\BasicSpider;
@@ -110,7 +110,7 @@ class GogoSpider extends BasicSpider {
             'language'    => str_ends_with($id, '-dub') ? 'dub' : 'sub',
             'names'       => $response->filter('.anime_info_body_bg p.type:nth-child(10) a')->text(),
             'origin'      => null,
-            'season'      => CateParser::parseSeason($response->filter('.anime_info_body_bg p.type:nth-child(4) a')->attr('href')),
+            'season'      => Helper::parseSeason($response->filter('.anime_info_body_bg p.type:nth-child(4) a')->attr('href')),
             'splash'      => $response->filter('.anime_info_body_bg img')->attr('src'),
             'status'      => $response->filter('.anime_info_body_bg p.type:nth-child(9) a')->text(),
             'title'       => $response->filter('.anime_info_body_bg h1')->text(),
@@ -143,7 +143,7 @@ class GogoSpider extends BasicSpider {
         // file_put_contents(public_path('episode_list.html'), $response->html());
 
         $href         = trim($response->filter('#episode_related a')->attr('href'));
-        $id_fragments = CateParser::parseEpisodeID($href);
+        $id_fragments = Helper::parseEpisodeID($href);
 
         if ($id_fragments) {
             yield $this->item($id_fragments);

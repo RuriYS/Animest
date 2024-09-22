@@ -2,7 +2,7 @@
 
 namespace App\Spiders;
 
-use App\Utils\CateParser;
+use App\Utils\Helper;
 use Generator;
 use Illuminate\Support\Facades\Log;
 use RoachPHP\Http\Request;
@@ -55,12 +55,12 @@ class GogoAjaxSpider extends BasicSpider {
 
         $list = $response->filter('.added_series_body > ul > li')->each(function (Crawler $node) {
             return [
-                'id'                => CateParser::parseTitleId($node->filter('a')->attr('href') ?? ''),
+                'id'                => Helper::parseTitleId($node->filter('a')->attr('href') ?? ''),
                 'genres'            => $node->filter('p.genres > a')->each(function (Crawler $subnode) {
                     return Cateparser::parseGenre($subnode->attr('href') ?? '');
                 }),
                 'latest_episode_id' => substr($node->filter('p:nth-of-type(2) > a')->attr('href'), 1),
-                'thumbnail'         => CateParser::parseThumbnail($node->filter('.thumbnail-popular')->attr('style')),
+                'thumbnail'         => Helper::parseThumbnail($node->filter('.thumbnail-popular')->attr('style')),
                 'title'             => $node->filter('a:nth-of-type(2)')->text(),
             ];
         });

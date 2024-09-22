@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessEpisode;
 use App\Jobs\ProcessTitle;
 use App\Models\Episode;
-use App\Utils\CateParser;
+use App\Utils\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -74,7 +74,7 @@ class EpisodeController extends ControllerAbstract {
 
         if ($input) {
             Cache::remember($key, now()->addHours(4), function () use ($input) {
-                return CateParser::parseEpisodeID(trim($input));
+                return Helper::parseEpisodeID(trim($input));
             });
         }
     }

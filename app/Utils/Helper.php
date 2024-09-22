@@ -3,7 +3,7 @@
 namespace App\Utils;
 use Illuminate\Support\Facades\Log;
 
-class CateParser {
+class Helper {
     public static function parseSeason(string $str): string {
         $split = explode('/', $str)[2];
         return explode('-', $split)[0];

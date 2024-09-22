@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Models\Title;
 use App\Models\Episode;
 use App\Spiders\VidstreamVideoSpider;
-use App\Utils\CateParser;
+use App\Utils\Helper;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
@@ -114,7 +114,7 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
             ]);
         }
 
-        $id_fragments = CateParser::parseEpisodeID($episode_id);
+        $id_fragments = Helper::parseEpisodeID($episode_id);
         $this->alias  = $id_fragments['alias'];
 
         Log::debug('[ProcessEpisode] Results processed', [
