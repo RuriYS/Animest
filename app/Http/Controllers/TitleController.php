@@ -7,11 +7,11 @@ use App\Models\Title;
 
 class TitleController extends ControllerAbstract {
     public function show(string $id) {
-        $title = Title::find($id);
+        $title = Title::with('genres')->find($id);
 
         if (!$title) {
             ProcessTitle::dispatchSync($id, false);
-            $title = Title::find($id);
+            $title = Title::with('genres')->find($id);
         }
 
         return response()->json([
