@@ -33,7 +33,7 @@ const Link = styled.a<LinkProps>`
 const Terms = () => {
     return (
         <TermsContainer>
-            <Title>Terms and Conditions</Title>
+            <Title>Terms And Conditions</Title>
 
             <Section>
                 <SectionTitle>Introduction</SectionTitle>

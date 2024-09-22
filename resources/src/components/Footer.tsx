@@ -39,7 +39,7 @@ const Footer = () => {
                         Animest.land
                     </FooterLink>
                     <FooterLink to='/terms' variant='small'>
-                        Terms & Privacy
+                        Terms & Conditions
                     </FooterLink>
                 </LinksContainer>
                 <SocialLinks>
