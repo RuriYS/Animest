@@ -9,4 +9,4 @@ public/*.html
 .vscode/
 
 package-lock.json
-.env
+.env*
