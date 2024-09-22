@@ -17,6 +17,7 @@ export interface SourceProps {
 }
 
 export interface EpisodeProps {
+    id: string;
     title_id: string;
     episode_index: string;
     upload_date: string;
