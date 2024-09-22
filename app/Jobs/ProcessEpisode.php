@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Title;
 use App\Models\Episode;
 use App\Spiders\VidstreamVideoSpider;
+use App\Utils\CateParser;
 use Exception;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
@@ -18,6 +19,8 @@ use RoachPHP\Roach;
 
 class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
     use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected string $alias;
 
     protected string $episode_id;
 
@@ -42,10 +45,10 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
 
     public function handle() {
         Log::debug(
-            'Processing Episode',
+            '[ProcessEpisode] Processing Episode',
             [
-                'id'       => $this->episode_id,
-                'title_id' => $this->title_id,
+                'episode_id' => $this->episode_id,
+                'title_id'   => $this->title_id,
             ],
         );
 
@@ -53,7 +56,7 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
 
         if (isset($this->results['error'])) {
             Log::warning(
-                'Episode Job discarded',
+                '[ProcessEpisode] Episode Job discarded',
                 [
                     'id'     => $this->episode_id,
                     'reason' => $this->results['error'],
@@ -89,7 +92,7 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
         );
 
         Log::debug(
-            'Spider collected',
+            '[ProcessEpisode] Spider collected',
             [
                 'episode_id' => $this->episode_id,
                 'results'    => $this->results,
@@ -98,29 +101,33 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
     }
 
     private function processResults(array $results) {
-        $episodeId = trim($results['episode_id'] ?? '');
-        $titleId   = $this->title_id;
+        $episode_id = trim($results['episode_id'] ?? '');
+        $title_id   = $this->title_id;
 
         $episodes = $results['episodes'] ?? [];
-        $meta     = $this->findEpisodeMeta($episodes, $episodeId);
+        $meta     = $this->findEpisodeMeta($episodes, $episode_id);
 
-        if (!$episodeId || !$titleId) {
+        if (!$episode_id || !$title_id) {
             Log::warning('Invalid episode or title ID', [
-                'episode_id' => $episodeId,
-                'title_id'   => $titleId,
+                'episode_id' => $episode_id,
+                'title_id'   => $title_id,
             ]);
         }
 
-        Log::debug('Results processed', [
-            'episodeId' => $episodeId,
-            'titleId'   => $titleId,
+        $id_fragments = CateParser::parseEpisodeID($episode_id);
+        $this->alias  = $id_fragments['alias'];
+
+        Log::debug('[ProcessEpisode] Results processed', [
+            'episode_id' => $episode_id,
+            'title_id'   => $title_id,
         ]);
 
         $this->episode_data = [
-            'id'            => $episodeId,
-            'episode_index' => explode('episode-', $episodeId)[1] ?? null,
+            'id'            => $episode_id,
+            'alias'         => $this->alias,
+            'episode_index' => $id_fragments['index'],
             'download_url'  => $results['download_url'] ?? null,
-            'title_id'      => $titleId,
+            'title_id'      => $title_id,
             'upload_date'   => $meta['date_added'] ?? null,
             'video'         => $results['stream_data'] ?? null,
         ];
@@ -144,22 +151,24 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
             $titleId,
         )->exists()) {
             Log::debug(
-                'Creating title',
-                ['titleId' => $titleId],
+                '[ProcessEpisode] Creating title',
+                ['title_id' => $titleId],
             );
             ProcessTitle::dispatchSync($titleId);
         }
     }
 
-    private function createEpisode(array $episodeData): void {
+    private function createEpisode(array $episode_data): void {
         $episode = Episode::updateOrCreate(
-            ['id' => $episodeData['id']],
-            $episodeData,
+            ['id' => $episode_data['id']],
+            $episode_data,
         );
 
         Log::debug(
-            'Episode updated',
-            ['id' => $episode->id],
+            '[ProcessEpisode] Episode updated',
+            [
+                $episode_data,
+            ],
         );
     }
 }

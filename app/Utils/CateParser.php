@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Utils;
+use Illuminate\Support\Facades\Log;
 
 class CateParser {
     public static function parseSeason(string $str): string {
@@ -8,9 +9,13 @@ class CateParser {
         return explode('-', $split)[0];
     }
 
-    public static function parseEpisodeAlias(string $str): string {
-        $split = explode('/', $str);
-        return $split[-1];
+    public static function parseEpisodeID(string $str): array {
+        preg_match('/([^\/]*?)-episode-(\d+)$/', trim($str), $matches);
+
+        return [
+            'alias' => $matches[1],
+            'index' => $matches[2],
+        ];
     }
 
     public static function parseTitleId(string $str): string {

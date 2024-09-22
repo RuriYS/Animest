@@ -142,13 +142,11 @@ class GogoSpider extends BasicSpider {
     public function parseEpisodeList(Response $response): Generator {
         // file_put_contents(public_path('episode_list.html'), $response->html());
 
-        $href = $response->filter('#episode_related a')->attr('href');
+        $href         = trim($response->filter('#episode_related a')->attr('href'));
+        $id_fragments = CateParser::parseEpisodeID($href);
 
-        if (preg_match('/\/([^\/]+)-episode-\d+$/', $href, $matches)) {
-            $alias = $matches[1];
-            yield $this->item([
-                'alias' => $alias,
-            ]);
+        if ($id_fragments) {
+            yield $this->item($id_fragments);
         } else {
             Log::warning("Could not extract alias ID: $href");
             yield $this->item([

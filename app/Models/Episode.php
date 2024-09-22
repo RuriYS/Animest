@@ -11,6 +11,7 @@ class Episode extends Model {
 
     protected $fillable = [
         'id',
+        'alias',
         'download_url',
         'episode_index',
         'title_id',

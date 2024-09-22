@@ -17,18 +17,20 @@ use RoachPHP\Roach;
 class ProcessTitle implements ShouldQueue, ShouldBeUnique {
     use Dispatchable, InteractsWithQueue, SerializesModels;
 
-    protected string $id;
+    protected string $title_id;
 
-    protected bool $processEps;
+    protected bool $process_eps;
 
+    protected bool $refresh_eps;
 
-    public function __construct(string $id, bool $processEps = true) {
-        $this->id         = $id;
-        $this->processEps = $processEps;
+    public function __construct(string $title_id, bool $process_eps = true, bool $refresh_eps) {
+        $this->title_id    = $title_id;
+        $this->process_eps = $process_eps;
+        $this->refresh_eps = $refresh_eps;
     }
 
     public function uniqueId(): string {
-        return $this->id;
+        return $this->title_id;
     }
 
     public function uniqueFor(): int {
@@ -36,39 +38,47 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
     }
 
     public function handle(): void {
-        $id = str($this->id)->toString();
-        Log::debug('Processing Title', ['id' => $id]);
+        $title_id = str($this->title_id)->toString();
+
+        Log::debug(
+            '[ProcessTitle] Processing Title',
+            [
+                'title_id'    => $title_id,
+                'process_eps' => $this->process_eps,
+                'refresh_eps' => $this->refresh_eps,
+            ],
+        );
 
         try {
-            $result = $this->collectSpider($id);
+            $result = $this->collectSpider($title_id);
 
             if (isset($result['error'])) {
-                Log::warning('Title Job discarded', ['id' => $this->id, 'reason' => $result['error']]);
+                Log::warning('Title Job discarded', ['id' => $this->title_id, 'reason' => $result['error']]);
                 return;
             }
 
             $title = $this->updateTitle($result);
             $this->processGenres($result['genres'] ?? [], $title);
 
-            if ($this->processEps) {
+            if ($this->process_eps) {
                 $this->processEpisodes($result['alias'], $result['length']);
             }
 
         } catch (\Exception $e) {
-            Log::error('Title processing failed', ['id' => $id, 'error' => $e->getMessage()]);
+            Log::error('Title processing failed', ['title_id' => $title_id, 'error' => $e->getMessage()]);
         }
     }
 
-    private function collectSpider(string $id): array {
+    private function collectSpider(string $title_id): array {
         $items = Roach::collectSpider(
             GogoSpider::class,
             context: [
-                'uri' => 'https://' . config('app.urls.gogo') . "/category/$id"
+                'uri' => 'https://' . config('app.urls.gogo') . "/category/$title_id"
             ],
         );
 
         $result = array_merge(...array_map(fn($item) => $item->all(), $items));
-        Log::debug('Spider collected', ['id' => $id, 'resultCount' => count($result)]);
+        Log::debug('[ProcessTitle] Spider collected', ['title_id' => $title_id, 'resultCount' => count($result)]);
         return $result;
     }
 
@@ -76,42 +86,55 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
         $titleData = array_diff_key($result, array_flip(['genres']));
         $title     = Title::updateOrCreate(['id' => $result['id']], $titleData);
 
-        Log::debug('Title updated', ['id' => $title->episode_id]);
+        Log::debug('[ProcessTitle] Title updated', ['title_id' => $title->id]);
         return $title;
     }
 
     private function processGenres(array $genres, Title $title): void {
         $genres = array_map('trim', $genres);
-        Log::debug("Processing genres", ['titleId' => $title->id, 'genreCount' => count($genres)]);
+        Log::debug("[ProcessTitle] Processing genres", ['titleId' => $title->id, 'genreCount' => count($genres)]);
 
         $genreIds = Genre::whereIn('name', $genres)->pluck('id')->toArray();
 
         if (!empty($genreIds)) {
             try {
                 $title->genres()->sync($genreIds);
-                Log::debug("Genres synced", ['titleId' => $title->id, 'genreCount' => count($genreIds)]);
+                Log::debug("[ProcessTitle] Genres synced", ['title_id' => $title->id, 'genreCount' => count($genreIds)]);
             } catch (\Exception $e) {
-                Log::error("Error syncing genres", ['titleId' => $title->id, 'error' => $e->getMessage()]);
+                Log::error("Error syncing genres", ['title_id' => $title->id, 'error' => $e->getMessage()]);
             }
         } else {
-            Log::warning("No valid genres found", ['titleId' => $title->id]);
+            Log::warning("No valid genres found", ['title_id' => $title->id]);
         }
     }
 
     private function processEpisodes(string $alias, int $length): void {
-        $existingEpisodes = Episode::where('title_id', $alias)
+        $cached_episodes = Episode::where('alias', $alias)
             ->pluck('episode_index')
             ->toArray();
 
-        $titleId = $this->id;
+        $titleId         = $this->title_id;
+        $dispatched_jobs = [];
 
         for ($i = 1; $i <= $length; $i++) {
-            if (!in_array($i, $existingEpisodes)) {
-                $episodeId = "{$alias}-episode-{$i}";
-                ProcessEpisode::dispatch($episodeId, $titleId)->onQueue('low');
+            if ($this->refresh_eps === true || ($this->refresh_eps === false && !in_array($i, $cached_episodes))) {
+                $episodeId         = "{$alias}-episode-{$i}";
+                $dispatched_jobs[] = ProcessEpisode::dispatch($episodeId, $titleId)->onQueue('low');
             }
         }
 
-        Log::debug("Episode jobs dispatched", ['alias' => $alias, 'totalEpisodes' => $length]);
+        if (count($dispatched_jobs) > 0) {
+            Log::debug(
+                "[ProcessTitle] Episode jobs dispatched",
+                [
+                    'alias'           => $alias,
+                    'cached_episodes' => $cached_episodes,
+                    'dispatched_jobs' => count($dispatched_jobs),
+                    'episodes'        => $length,
+                ],
+            );
+        } else {
+            Log::debug('[ProcessTitle] All episodes are cached, nothing to do.');
+        }
     }
 }
