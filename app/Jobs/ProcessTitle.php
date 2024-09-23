@@ -130,7 +130,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
         $existingEpisodes = Episode::where('alias', $alias)
             ->where(function ($query) use ($updateThreshold) {
                 $query->whereNull('updated_at')
-                    ->orWhere('updated_at', '<', $updateThreshold);
+                    ->orWhere('updated_at', '>', $updateThreshold);
             })
             ->pluck('episode_index')
             ->toArray();
@@ -144,6 +144,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
         foreach ($episodesToProcess as $i) {
             $episode_id = "{$alias}-episode-{$i}";
             ProcessEpisode::dispatch($episode_id, $this->title_id)->onQueue('low');
+
             Log::debug('[ProcessTitle] Dispatched episode', [
                 'alias'      => $alias,
                 'episode_id' => $episode_id,

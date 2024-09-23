@@ -28,8 +28,8 @@ class EpisodeController extends ControllerAbstract {
             return Episode::where('title_id', $title_id)->get();
         });
 
-        if ($episodes->isEmpty() || $episodes->count() != $title->length) {
-            ProcessTitle::dispatch($title_id, true, true)->onQueue('high');
+        if ($episodes->isEmpty() || $episodes->count() < $title->length) {
+            ProcessTitle::dispatch($title_id, true, false)->onQueue('high');
             return response()->json([
                 'query'    => $title_id,
                 'exists'   => true,
