@@ -12,33 +12,34 @@ import {
 import useEpisodes from '@/hooks/useEpisodes';
 import moment from 'moment';
 import { SortMode } from 'types';
-import { WatchLoading } from '@/elements';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 const WatchContainer = styled.div`
     ${tw`flex flex-col gap-y-8 w-full bg-black`}
 `;
 
 const InfoContainer = ({
+    state,
     header,
-    args,
+    message,
 }: {
-    header: string;
-    args: string[];
+    state: 'loading' | 'error';
+    header?: string;
+    message: string;
 }) => (
-    <ContentContainer>
-        <Constraint>
-            <div className='flex flex-col gap-4'>
-                <h1 className='text-lg'>{header}</h1>
-                <span>
-                    {args.map((v, i) => (
-                        <p key={Math.random() * 1000} className='muted'>
-                            {v}
-                        </p>
-                    ))}
-                </span>
+    <Constraint>
+        <ContentContainer>
+            <div className='flex flex-col gap-4 items-center'>
+                {state === 'loading' ? (
+                    <Loader2 className='w-16 h-16 animate-spin' />
+                ) : (
+                    <AlertCircle className='w-16 h-16 text-red-500' />
+                )}
+                <p className='text-base'>{header}</p>
+                <p className='muted text-xs'>{message}</p>
             </div>
-        </Constraint>
-    </ContentContainer>
+        </ContentContainer>
+    </Constraint>
 );
 
 export default function Watch() {
@@ -48,9 +49,12 @@ export default function Watch() {
         id: string;
         episodeIndex?: string;
     }>();
-    const { loading, episodes, meta, error, message } = useEpisodes(id!, args);
+    const { loading, episodes, meta, error, header, message } = useEpisodes(
+        id!,
+        args,
+    );
     const [currentPage, setCurrentPage] = useState(1);
-    const [sortMode, setSort] = useState<SortMode>('index-asc');
+    const [sortMode, setSort] = useState<SortMode>('newest');
     const episodesPerPage = 10;
 
     useEffect(() => {
@@ -115,67 +119,53 @@ export default function Watch() {
         setSort(sort);
     }, []);
 
-    if (loading && message) return <WatchLoading message={message} />;
-
-    if (error)
+    if (loading || !meta || (!sortedEpisodes && !currentEpisode)) {
         return (
-            <Constraint>
-                <InfoContainer
-                    header='Something went wrong'
-                    args={[error.message]}
-                />
-            </Constraint>
-        );
-
-    if (!meta || !sortedEpisodes || !currentEpisode) {
-        return (
-            <Constraint>
-                <InfoContainer
-                    header="We couldn't display this episode"
-                    args={[
-                        'Try reloading your browser.',
-                        `Title: ${!!meta ? 'Found' : 'Not found'}`,
-                        `Episodes: ${!!sortedEpisodes ? 'Found' : 'Not found'}`,
-                        `Video: ${!!currentEpisode ? 'Found' : 'Not found'}`,
-                    ]}
-                />
-            </Constraint>
+            <InfoContainer
+                state={error ? 'error' : 'loading'}
+                header={header}
+                message={message}
+            />
         );
     }
 
     const indexOfLastEpisode = currentPage * episodesPerPage;
     const indexOfFirstEpisode = indexOfLastEpisode - episodesPerPage;
-    const currentEpisodes = sortedEpisodes.slice(
+    const currentEpisodes = sortedEpisodes!.slice(
         indexOfFirstEpisode,
         indexOfLastEpisode,
     );
-    const totalPages = Math.ceil(sortedEpisodes.length / episodesPerPage);
+    const totalPages = Math.ceil(sortedEpisodes!.length / episodesPerPage);
 
     return (
         <Constraint>
             <title>{meta.title} | Animest</title>
-            <WatchContainer>
-                <PlayerWrapper
-                    src={currentEpisode.video.source[0].file}
-                    title={`${meta.title} · Episode ${currentEpisode.episode_index}`}
-                    onEnd={handleEpisodeEnd}
-                />
-                <div className='grid px-2 gap-2 lg:grid-cols-2 lg:px-8 lg:gap-4'>
-                    <EpisodeInfo
-                        meta={meta}
-                        episode={currentEpisode}
-                        views={currentEpisode.views}
+            {currentEpisode && (
+                <WatchContainer>
+                    <PlayerWrapper
+                        src={currentEpisode!.video.source[0].file}
+                        title={`${meta.title} · Episode ${
+                            currentEpisode!.episode_index
+                        }`}
+                        onEnd={handleEpisodeEnd}
                     />
-                    <EpisodeList
-                        meta={meta}
-                        episodes={currentEpisodes}
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                        onSortChange={handleSortChange}
-                    />
-                </div>
-            </WatchContainer>
+                    <div className='grid px-2 gap-2 lg:grid-cols-2 lg:px-8 lg:gap-4'>
+                        <EpisodeInfo
+                            meta={meta}
+                            episode={currentEpisode!}
+                            views={currentEpisode!.views}
+                        />
+                        <EpisodeList
+                            meta={meta}
+                            episodes={currentEpisodes}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                            onSortChange={handleSortChange}
+                        />
+                    </div>
+                </WatchContainer>
+            )}
         </Constraint>
     );
 }

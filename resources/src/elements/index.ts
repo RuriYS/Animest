@@ -10,5 +10,4 @@ export { default as Pagination } from './Pagination';
 export { default as PlayerWrapper } from './PlayerWrapper';
 export { default as SortSelect } from './SortSelect';
 export { default as SearchResult } from './SearchResult';
-export { default as WatchLoading } from './WatchLoading';
 export { default as FourOhFour } from './ForOhFour';

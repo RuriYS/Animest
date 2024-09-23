@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { EpisodeProps, MetaProps } from 'types';
 import { URLSearchParams } from 'url';
-import { error } from 'console';
 
 function useInterval(callback: () => void, delay: number | null) {
     const savedCallback = useRef<() => void>();
@@ -27,14 +26,19 @@ export default function useEpisodes(id: string, args?: URLSearchParams) {
         loading: true,
         episodes: null as EpisodeProps[] | null,
         meta: null as MetaProps | null,
-        error: null as Error | null,
-        message: null as string | null,
+        error: null as Error | string | null,
+        header: 'Loading episode' as string,
+        message: 'Initializing' as string,
     });
     const [episodesPolling, setEpisodesPolling] = useState(true);
     const [metaPolling, setMetaPolling] = useState(true);
 
     const fetchEpisodes = useCallback(async () => {
         try {
+            setState((prev) => ({
+                ...prev,
+                message: 'Fetching episodes',
+            }));
             const query = args ? `?${args.toString()}` : '';
             const { data, status } = await axios.get(
                 `/api/episodes/${id}${query}`,
@@ -43,7 +47,6 @@ export default function useEpisodes(id: string, args?: URLSearchParams) {
                 setState((prev) => ({
                     ...prev,
                     episodes: data.episodes,
-                    loading: false,
                 }));
                 setEpisodesPolling(false);
             } else if (data.errors) {
@@ -54,10 +57,12 @@ export default function useEpisodes(id: string, args?: URLSearchParams) {
                     message: data.message,
                 }));
             }
-        } catch (error) {
+        } catch (error: any | AxiosError) {
             setState((prev) => ({
                 ...prev,
                 error: error as Error,
+                header: 'Error',
+                message: error.toString(),
                 loading: false,
             }));
             setEpisodesPolling(false);
@@ -67,6 +72,10 @@ export default function useEpisodes(id: string, args?: URLSearchParams) {
 
     const fetchMeta = useCallback(async () => {
         try {
+            setState((prev) => ({
+                ...prev,
+                message: 'Fetching metadata',
+            }));
             const { data, status } = await axios.get(`/api/titles/${id}`);
             if (data.result) {
                 setState((prev) => ({ ...prev, meta: data.result }));
@@ -79,10 +88,12 @@ export default function useEpisodes(id: string, args?: URLSearchParams) {
                     message: data.message,
                 }));
             }
-        } catch (error) {
+        } catch (error: any | AxiosError) {
             setState((prev) => ({
                 ...prev,
                 error: error as Error,
+                header: 'Error',
+                message: error.toString(),
                 loading: false,
             }));
             setEpisodesPolling(false);
@@ -90,13 +101,23 @@ export default function useEpisodes(id: string, args?: URLSearchParams) {
         }
     }, [id]);
 
-    useInterval(fetchEpisodes, episodesPolling ? 5000 : null);
     useInterval(fetchMeta, metaPolling ? 5000 : null);
+    useInterval(fetchEpisodes, episodesPolling ? 5000 : null);
 
     useEffect(() => {
         fetchMeta();
         fetchEpisodes();
     }, [fetchEpisodes, fetchMeta]);
+
+    useEffect(() => {
+        if (state.episodes && state.meta) {
+            setState((prev) => ({
+                ...prev,
+                message: 'Done',
+                loading: false,
+            }));
+        }
+    }, [state]);
 
     return state;
 }

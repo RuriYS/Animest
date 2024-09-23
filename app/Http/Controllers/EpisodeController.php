@@ -20,7 +20,7 @@ class EpisodeController extends ControllerAbstract {
                 'query'    => $title_id,
                 'exists'   => false,
                 'episodes' => [],
-                'message'  => 'Title processing initiated. Please try again shortly.',
+                'message'  => 'Title not found. Adding to queue.',
             ], 202);
         }
 
@@ -34,7 +34,7 @@ class EpisodeController extends ControllerAbstract {
                 'query'    => $title_id,
                 'exists'   => true,
                 'episodes' => $episodes,
-                'message'  => 'Episode list may be incomplete. Processing initiated.',
+                'message'  => 'Episode list may be incomplete. Adding to queue.',
             ], 202);
         }
 
@@ -62,7 +62,7 @@ class EpisodeController extends ControllerAbstract {
                 'index'   => $index,
                 'exists'  => false,
                 'episode' => null,
-                'message' => 'Episode processing initiated. Please try again shortly.',
+                'message' => 'Episode has been queued.',
             ], 202);
         }
 
