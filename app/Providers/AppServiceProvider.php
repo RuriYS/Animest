@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider {
 
     public function boot(): void {
         RateLimiter::for('proxy', function ($request) {
-            return Limit::perMinute(maxAttempts: 120)->by($request->ip());
+            return Limit::perMinute(maxAttempts: 200)->by($request->ip());
         });
     }
 }
