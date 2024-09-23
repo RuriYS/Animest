@@ -12,6 +12,8 @@ use Symfony\Component\DomCrawler\Crawler;
 use RoachPHP\Downloader\Middleware\UserAgentMiddleware;
 
 class GogoAjaxSpider extends BasicSpider {
+    public array $extensions = [];
+
     protected function initialRequests(): array {
         return [
             new Request(
@@ -36,7 +38,6 @@ class GogoAjaxSpider extends BasicSpider {
         if ($response->getStatus() && count($paths) >= 2) {
             $path = implode("/", array_slice($paths, 0, 2));
 
-            Log::debug("Path: $path");
             switch ($path) {
                 case 'ajax/page-recent-release-ongoing.html':
                     yield from $this->parsePopularReleases($response);
