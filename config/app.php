@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Animest'),
+    'name'            => env('APP_NAME', 'Animest'),
 
     /*
     |--------------------------------------------------------------------------
@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'env' => env('APP_ENV', 'production'),
+    'env'             => env('APP_ENV', 'production'),
 
     /*
     |--------------------------------------------------------------------------
@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug'           => (bool) env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url'             => env('APP_URL', 'http://localhost'),
 
     /*
     |--------------------------------------------------------------------------
@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'timezone'        => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------
@@ -78,11 +78,11 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale'          => env('APP_LOCALE', 'en'),
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale'    => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*
     |--------------------------------------------------------------------------
@@ -95,13 +95,13 @@ return [
     |
     */
 
-    'cipher' => 'AES-256-CBC',
+    'cipher'          => 'AES-256-CBC',
 
-    'key' => env('APP_KEY'),
+    'key'             => env('APP_KEY'),
 
-    'previous_keys' => [
+    'previous_keys'   => [
         ...array_filter(
-            explode(',', env('APP_PREVIOUS_KEYS', ''))
+            explode(',', env('APP_PREVIOUS_KEYS', '')),
         ),
     ],
 
@@ -118,9 +118,9 @@ return [
     |
     */
 
-    'maintenance' => [
+    'maintenance'     => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
-        'store' => env('APP_MAINTENANCE_STORE', 'database'),
+        'store'  => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
     /*
@@ -132,16 +132,16 @@ return [
     |
     */
 
-    'urls' => [
-        'ajax' => env('GOGO_AJAX_URL', ''),
-        'gogo' => env('GOGO_URL', ''),
-        'vidstream' => env('VIDSTREAM_URL', ''),
-        'api' => env('API_URL', ''),
+    'urls'            => [
+        'ajax'         => env('GOGO_AJAX_URL', ''),
+        'gogo'         => env('GOGO_URL', ''),
+        'vidstream'    => env('VIDSTREAM_URL', ''),
+        'api'          => env('API_URL', ''),
         'proxy_origin' => env('PROXY_ORIGIN', ''),
     ],
 
-    'user_agent' => env('USER_AGENT', ''),
-    'encryption_key' => env('ENCRYPTION_KEY', ''),
-    'decryption_key' => env('DECRYPTION_KEY', ''),
-    'iv_key' => env('IV_KEY', ''),
+    'user_agent'      => env('USER_AGENT', ''),
+    'encryption_key'  => env('ENCRYPTION_KEY', ''),
+    'decryption_key'  => env('DECRYPTION_KEY', ''),
+    'iv_key'          => env('IV_KEY', ''),
 ];

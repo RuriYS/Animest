@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Constraint, ContentContainer } from '.';
 
-export default function WatchLoading() {
+export default function WatchLoading({ message }: { message: string }) {
     const [showMessage, setShowMessage] = useState(false);
 
     useEffect(() => {
@@ -19,13 +19,7 @@ export default function WatchLoading() {
                     <h1 className='text-lg'>The episode is loading...</h1>
                     {showMessage && (
                         <>
-                            <p className='muted'>
-                                Our tiny spiders are doing their best to crawl
-                                the data for you, please wait {'<3'}
-                            </p>
-                            <p className='muted'>
-                                We'll let you know when it's ready.
-                            </p>
+                            <p className='muted'>{message}</p>
                         </>
                     )}
                 </div>

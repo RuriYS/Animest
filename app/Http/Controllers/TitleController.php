@@ -5,20 +5,27 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessTitle;
 use App\Models\Title;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class TitleController extends ControllerAbstract {
     public function show(string $id) {
-        $title = Title::with('genres')->find($id);
+        $title = Cache::remember("title:{$id}", 3600, function () use ($id) {
+            return Title::with('genres')->find($id);
+        });
 
         if (!$title) {
-            ProcessTitle::dispatchSync($id);
-            $title = Title::with('genres')->find($id);
+            ProcessTitle::dispatch($id)->onQueue('high');
+            return response()->json([
+                'message' => "Title not found. Adding to queue.",
+                'query'  => $id,
+                'result' => null,
+            ], 202);
         }
 
         return response()->json([
-            'errors' => $title ? null : "Title not found, it's either invalid or doesn't exist",
+            'errors' => null,
             'query'  => $id,
-            'result' => $title?->toArray(),
+            'result' => $title->toArray(),
         ]);
     }
 
@@ -26,7 +33,7 @@ class TitleController extends ControllerAbstract {
         $process_eps = $request->boolean('eps', true);
         $refresh_eps = $request->boolean('refresh_eps', true);
 
-        ProcessTitle::dispatch($id, $process_eps, $refresh_eps);
+        ProcessTitle::dispatch($id, $process_eps, $refresh_eps)->onQueue('high');
         return response()->json([
             'message' => 'Job dispatched',
         ]);

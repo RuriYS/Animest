@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styled from '@emotion/styled';
 import tw from 'twin.macro';
 import {
@@ -43,18 +43,19 @@ const InfoContainer = ({
 
 export default function Watch() {
     const navigate = useNavigate();
+    const [args] = useSearchParams();
     const { id, episodeIndex } = useParams<{
         id: string;
         episodeIndex?: string;
     }>();
-    const { loading, episodes, meta, error } = useEpisodes(id!);
+    const { loading, episodes, meta, error, message } = useEpisodes(id!, args);
     const [currentPage, setCurrentPage] = useState(1);
     const [sortMode, setSort] = useState<SortMode>('index-asc');
     const episodesPerPage = 10;
 
     useEffect(() => {
         if (!episodeIndex) {
-            navigate(`/watch/${id}/episode/1`, { replace: true });
+            navigate(`/watch/${id}/episode/1/${args}`, { replace: true });
         }
     }, [id, episodeIndex, navigate]);
 
@@ -114,13 +115,13 @@ export default function Watch() {
         setSort(sort);
     }, []);
 
-    if (loading) return <WatchLoading />;
+    if (loading && message) return <WatchLoading message={message} />;
 
     if (error)
         return (
             <Constraint>
                 <InfoContainer
-                    header="The resource doesn't seem to exist"
+                    header='Something went wrong'
                     args={[error.message]}
                 />
             </Constraint>
@@ -133,9 +134,9 @@ export default function Watch() {
                     header="We couldn't display this episode"
                     args={[
                         'Try reloading your browser.',
-                        `Metadata: ${!!meta}`,
-                        `Episodes: ${!!sortedEpisodes}`,
-                        `Episode: ${!!currentEpisode}`,
+                        `Title: ${!!meta ? 'Found' : 'Not found'}`,
+                        `Episodes: ${!!sortedEpisodes ? 'Found' : 'Not found'}`,
+                        `Video: ${!!currentEpisode ? 'Found' : 'Not found'}`,
                     ]}
                 />
             </Constraint>

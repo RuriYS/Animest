@@ -5,30 +5,44 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessEpisode;
 use App\Jobs\ProcessTitle;
 use App\Models\Episode;
+use App\Models\Title;
 use App\Utils\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class EpisodeController extends ControllerAbstract {
-    protected string $error = '';
+    public function index(Request $request, string $title_id) {
+        $title = Title::find($title_id);
 
-    public function index(string $title_id) {
-        $episodes = Episode::where(
-            'title_id',
-            $title_id,
-        )->get();
-
-        if ($episodes->isEmpty()) {
-            ProcessTitle::dispatchSync($title_id);
+        if (!$title || $request->boolean('refresh')) {
+            ProcessTitle::dispatch($title_id)->onQueue('high');
+            return response()->json([
+                'query'    => $title_id,
+                'exists'   => false,
+                'episodes' => [],
+                'message'  => 'Title processing initiated. Please try again shortly.',
+            ], 202);
         }
 
-        return response()->json(
-            [
+        $episodes = Cache::remember("episodes:{$title_id}", 3600, function () use ($title_id) {
+            return Episode::where('title_id', $title_id)->get();
+        });
+
+        if ($episodes->isEmpty() || $episodes->count() != $title->length) {
+            ProcessTitle::dispatch($title_id, true, true)->onQueue('high');
+            return response()->json([
                 'query'    => $title_id,
-                'exists'   => $episodes->isNotEmpty(),
+                'exists'   => true,
                 'episodes' => $episodes,
-            ],
-        );
+                'message'  => 'Episode list may be incomplete. Processing initiated.',
+            ], 202);
+        }
+
+        return response()->json([
+            'query'    => $title_id,
+            'exists'   => true,
+            'episodes' => $episodes,
+        ]);
     }
 
     public function show(string $title_id, string $index) {
@@ -37,24 +51,19 @@ class EpisodeController extends ControllerAbstract {
             "{$title_id}-{$index}",
         ];
 
-        // Try finding the episode using both formats
-        $episode = Episode::whereIn(
-            'id',
-            $id_formats,
-        )->first();
+        $episode = Cache::remember("episode:{$id_formats[0]}", 3600, function () use ($id_formats) {
+            return Episode::whereIn('id', $id_formats)->first();
+        });
 
-        // If it doesn't exist, process it & retry
         if (!$episode && $title_id && $index) {
-            ProcessEpisode::dispatchSync(
-                $id_formats[0],
-                $title_id,
-            );
-
-            $episode = Episode::find($id_formats[0]);
-
-            if (!$episode) {
-                $this->error = 'Episode not found';
-            }
+            ProcessEpisode::dispatch($id_formats[0], $title_id)->onQueue('high');
+            return response()->json([
+                'query'   => $title_id,
+                'index'   => $index,
+                'exists'  => false,
+                'episode' => null,
+                'message' => 'Episode processing initiated. Please try again shortly.',
+            ], 202);
         }
 
         return response()->json([
@@ -62,20 +71,6 @@ class EpisodeController extends ControllerAbstract {
             'index'   => $index,
             'exists'  => (bool) $episode,
             'episode' => $episode,
-            'errors'  => (string) $this->error ?? null
         ]);
-    }
-
-    // Utils endpoints
-
-    public function parseEpisodeId(Request $request) {
-        $input = $request->input('i');
-        $key   = "episodeid_parser:$input";
-
-        if ($input) {
-            Cache::remember($key, now()->addHours(4), function () use ($input) {
-                return Helper::parseEpisodeID(trim($input));
-            });
-        }
     }
 }

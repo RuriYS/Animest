@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('episode_index')->nullable();
             $table->string('upload_date')->nullable();
             $table->json('video')->nullable();
+            $table->timestamps();
 
             $table->foreign('title_id')->references('id')->on('titles');
         });
