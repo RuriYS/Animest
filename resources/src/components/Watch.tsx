@@ -4,64 +4,37 @@ import styled from '@emotion/styled';
 import tw from 'twin.macro';
 import {
     Constraint,
-    ContentContainer,
     EpisodeInfo,
     EpisodeList,
     PlayerWrapper,
+    WatchInfoContainer,
 } from '@/elements';
 import useEpisodes from '@/hooks/useEpisodes';
 import moment from 'moment';
 import { SortMode } from 'types';
-import { AlertCircle, Loader2 } from 'lucide-react';
 
 const WatchContainer = styled.div`
     ${tw`flex flex-col gap-y-8 w-full bg-black`}
 `;
 
-const InfoContainer = ({
-    state,
-    header,
-    message,
-}: {
-    state: 'loading' | 'error';
-    header?: string;
-    message: string;
-}) => (
-    <Constraint>
-        <ContentContainer>
-            <div className='flex flex-col gap-4 items-center'>
-                {state === 'loading' ? (
-                    <Loader2 className='w-16 h-16 animate-spin' />
-                ) : (
-                    <AlertCircle className='w-16 h-16 text-red-500' />
-                )}
-                <p className='text-base'>{header}</p>
-                <p className='muted text-xs'>{message}</p>
-            </div>
-        </ContentContainer>
-    </Constraint>
-);
-
 export default function Watch() {
     const navigate = useNavigate();
     const [args] = useSearchParams();
-    const { id, episodeIndex } = useParams<{
+    const { id, index } = useParams<{
         id: string;
-        episodeIndex?: string;
+        index?: string;
     }>();
-    const { loading, episodes, meta, error, header, message } = useEpisodes(
-        id!,
-        args,
-    );
+    const { loading, currentEpisode, episodes, meta, error, header, message } =
+        useEpisodes(id!, index, args);
     const [currentPage, setCurrentPage] = useState(1);
-    const [sortMode, setSort] = useState<SortMode>('newest');
+    const [sortMode, setSort] = useState<SortMode>('index-desc');
     const episodesPerPage = 10;
 
     useEffect(() => {
-        if (!episodeIndex) {
+        if (!index) {
             navigate(`/watch/${id}/episode/1/${args}`, { replace: true });
         }
-    }, [id, episodeIndex, navigate]);
+    }, [id, index, navigate]);
 
     const sortedEpisodes = useMemo(() => {
         if (!episodes) return null;
@@ -94,11 +67,6 @@ export default function Watch() {
         }
     }, [episodes, sortMode]);
 
-    const currentEpisode = useMemo(
-        () => sortedEpisodes?.find((ep) => ep.episode_index == episodeIndex),
-        [sortedEpisodes, episodeIndex],
-    );
-
     const handleEpisodeEnd = useCallback(() => {
         const nextEpisode = sortedEpisodes?.find(
             (ep) =>
@@ -119,9 +87,9 @@ export default function Watch() {
         setSort(sort);
     }, []);
 
-    if (loading || !meta || (!sortedEpisodes && !currentEpisode)) {
+    if (loading || (error && message)) {
         return (
-            <InfoContainer
+            <WatchInfoContainer
                 state={error ? 'error' : 'loading'}
                 header={header}
                 message={message}
@@ -139,24 +107,24 @@ export default function Watch() {
 
     return (
         <Constraint>
-            <title>{meta.title} | Animest</title>
+            <title>{meta!.title} | Animest</title>
             {currentEpisode && (
                 <WatchContainer>
                     <PlayerWrapper
                         src={currentEpisode!.video.source[0].file}
-                        title={`${meta.title} · Episode ${
+                        title={`${meta!.title} · Episode ${
                             currentEpisode!.episode_index
                         }`}
                         onEnd={handleEpisodeEnd}
                     />
                     <div className='grid px-2 gap-2 lg:grid-cols-2 lg:px-8 lg:gap-4'>
                         <EpisodeInfo
-                            meta={meta}
+                            meta={meta!}
                             episode={currentEpisode!}
                             views={currentEpisode!.views}
                         />
                         <EpisodeList
-                            meta={meta}
+                            meta={meta!}
                             episodes={currentEpisodes}
                             currentPage={currentPage}
                             totalPages={totalPages}

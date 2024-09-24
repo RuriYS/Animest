@@ -14,10 +14,7 @@ const Main = () => {
             <Route path='/queues' element={<Queues />} />
             <Route path='/terms' element={<Terms />} />
             <Route path='/watch/:id' element={<Watch />} />
-            <Route
-                path='/watch/:id/episode/:episodeIndex'
-                element={<Watch />}
-            />
+            <Route path='/watch/:id/episode/:index' element={<Watch />} />
             <Route path='*' element={<FourOhFour />} />
         </Routes>
     );
