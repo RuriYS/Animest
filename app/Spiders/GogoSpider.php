@@ -31,16 +31,6 @@ use RoachPHP\Downloader\Middleware\UserAgentMiddleware;
  */
 
 class GogoSpider extends BasicSpider {
-    protected function initialRequests(): array {
-        return [
-            new Request(
-                method: 'GET',
-                uri: $this->context['uri'],
-                parseMethod: [$this, 'parse'],
-            ),
-        ];
-    }
-
     public array $downloaderMiddleware = [
         [
             UserAgentMiddleware::class,
@@ -48,33 +38,47 @@ class GogoSpider extends BasicSpider {
         ],
     ];
 
-    public array $extensions     = [];
+    public array $extensions = [];
+
     public array $itemProcessors = [
         GogoProcessor::class,
     ];
-    public function parse(Response $response): Generator {
-        $path  = parse_url($response->getUri(), PHP_URL_PATH);
-        $paths = array_filter(explode("/", $path));
 
-        if ($response->getStatus() === 200 && isset($paths[1])) {
-            switch ($paths[1]) {
-                case 'category':
-                    yield from $this->parseCategory($response, $paths[2]);
-                    break;
-                case 'filter.html':
-                    yield from $this->parseFilterResults($response);
-                    break;
-                default:
-                    yield $this->item([
-                        'error' => 'Invalid path specified',
-                    ]);
-                    break;
-            }
-        } else {
-            yield $this->item([
-                'error' => 'Invalid Request',
-            ]);
-        }
+    protected function initialRequests(): array {
+        $args     = $this->context['args'] ?? null;
+        $base_url = $this->context['base_url'];
+        $params   = $args ? http_build_query($args['params']) : null;
+        $uri      = $params ? "$base_url?$params" : $base_url;
+        $path     = parse_url($uri, PHP_URL_PATH);
+        $paths    = array_filter(explode("/", $path));
+
+        Log::debug("[GogoSpider] URI: $uri");
+
+        $requests = [];
+
+        $requests[] = isset($paths[1]) ? match ($paths[1]) {
+            'category'    => new Request(
+                method: 'GET',
+                uri: $uri,
+                parseMethod: function (Response $response) use ($paths) {
+                        return $this->parseCategory($response, $paths[2] ?? null);
+                    },
+            ),
+            'filter.html' => new Request(
+                method: 'GET',
+                uri: $uri,
+                parseMethod: function (Response $response) use ($args) {
+                        return $this->parseFilterResults($response, $args);
+                    },
+            ),
+        } : new Request(
+            method: 'GET',
+            uri: $uri,
+            parseMethod: [$this, 'parseError'],
+            options: ['error' => 'Invalid Request'],
+        );
+
+        return $requests;
     }
 
     public function parseCategory(Response $response, string $id): Generator {
@@ -120,8 +124,8 @@ class GogoSpider extends BasicSpider {
         yield $this->item($items);
     }
 
-    public function parseFilterResults(Response $response): Generator {
-        $items = $response->filter('.items li')->each(
+    public function parseFilterResults(Response $response, array $args): Generator {
+        $results = $response->filter('.items li')->each(
             function (Crawler $node) {
                 $releasedNode = $node->filter('.released');
                 $releasedNode ? preg_match('/\d+/', $releasedNode->text(), $matches) : null;
@@ -136,7 +140,9 @@ class GogoSpider extends BasicSpider {
             }
         );
 
-        yield $this->item($items);
+        yield $this->item([
+            'results' => $results,
+        ]);
     }
 
     public function parseEpisodeList(Response $response): Generator {
@@ -154,4 +160,8 @@ class GogoSpider extends BasicSpider {
             ]);
         }
     }
+    /**
+     * @inheritDoc
+     */
+    public function parse(Response $response): Generator {}
 }

@@ -9,28 +9,33 @@ use RoachPHP\Roach;
 
 class SearchController extends ControllerAbstract {
     public function search(Request $request) {
-        $q    = $request->input('q');
-        $sort = $request->input('s') ?? 'title_az';
+        $query    = $request->input('q') ?? '';
+        $page     = $request->input('p') ?? '';
+        $sort     = $request->input('s') ?? 'title_az';
+        $limit    = $request->integer('limit') ?? 20;
+        $cacheKey = "search_results:{$query}:{$page}:{$sort}";
 
-        $cacheKey = "search_results:{$q}:{$sort}";
+        $args = [
+            'params' => [
+                'keyword' => $query,
+                'sort'    => $sort,
+                'page'    => $page,
+            ],
+            'limit'  => $limit,
+        ];
 
         $results = Cache::remember(
             $cacheKey,
             now()->addHours(4),
-            function () use ($q, $sort) {
-                $params = http_build_query([
-                    'keyword' => $q,
-                    'sort'    => $sort,
-                ]);
-
+            function () use ($args) {
                 $items = Roach::collectSpider(
                     GogoSpider::class,
                     context: [
-                        'uri' => sprintf(
-                            'https://%s/filter.html?%s',
+                        'base_url' => sprintf(
+                            'https://%s/filter.html',
                             config('app.urls.gogo'),
-                            $params,
                         ),
+                        'args'     => $args,
                     ],
                 );
 
@@ -44,9 +49,9 @@ class SearchController extends ControllerAbstract {
         );
 
         return response()->json([
-            'query'   => $q,
-            'count'   => count($results),
-            'results' => $results,
+            'query' => $query,
+            'count' => count($results),
+            ...$results,
         ]);
     }
 }
