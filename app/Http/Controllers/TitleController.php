@@ -9,15 +9,15 @@ use Illuminate\Support\Facades\Cache;
 
 class TitleController extends ControllerAbstract {
     public function show(Request $request, string $id) {
-        $process     = $request->boolean('p') ?? false;
-        $refresh_eps = $request->boolean('r') ?? false;
+        $process = $request->boolean('p') ?? false;
+        $refresh = $request->boolean('r') ?? false;
 
         $title = Cache::remember("title:{$id}", 3600, function () use ($id) {
             return Title::with('genres')->find($id);
         });
 
         if (!$title) {
-            ProcessTitle::dispatch($id, $process, $refresh_eps)->onQueue('high');
+            ProcessTitle::dispatch($id, $process, $refresh)->onQueue('high');
             return response()->json([
                 'message' => "Title not found. Adding to queue.",
                 'query'   => $id,
