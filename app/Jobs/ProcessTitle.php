@@ -26,7 +26,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
 
     protected bool $refresh_eps;
 
-    public function __construct(string $title_id, bool $process_eps = true, bool $refresh_eps = true) {
+    public function __construct(string $title_id, bool $process_eps = false, bool $refresh_eps = false) {
         $this->title_id    = $title_id;
         $this->process_eps = $process_eps;
         $this->refresh_eps = $refresh_eps;
@@ -85,7 +85,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
         $items = Roach::collectSpider(
             GogoSpider::class,
             context: [
-                'uri' => 'https://' . config('app.urls.gogo') . "/category/$title_id"
+                'base_url' => 'https://' . config('app.urls.gogo') . "/category/$title_id"
             ],
         );
 
