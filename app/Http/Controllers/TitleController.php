@@ -17,12 +17,18 @@ class TitleController extends ControllerAbstract {
         });
 
         if (!$title) {
-            ProcessTitle::dispatch($id, $process, $refresh)->onQueue('high');
+            $result = null;
+            if ($process) {
+                ProcessTitle::dispatch($id, $process, $refresh)->onQueue('high');
+            } else {
+                ProcessTitle::dispatchSync($id, $process, false);
+                $result = Title::with('genres')->find($id);
+            }
             return response()->json([
-                'message' => "Title not found. Adding to queue.",
+                'message' => $process ? 'Title not found. Adding to queue.' : ($result ? 'Success' : 'Not found'),
                 'query'   => $id,
-                'result'  => null,
-            ], 202);
+                'result'  => $result,
+            ], $process ? 202 : ($result ? 200 : 404));
         }
 
         return response()->json([
