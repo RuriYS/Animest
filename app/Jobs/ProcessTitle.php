@@ -12,7 +12,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RoachPHP\Roach;
@@ -70,7 +69,6 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
                 if ($this->process_eps) {
                     $this->processEpisodes($result['alias'], $result['length']);
                 }
-                $this->refreshTitleCache($title);
             });
 
         } catch (\Exception $e) {
@@ -157,10 +155,5 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
             'dispatched_jobs' => count($episodesToProcess),
             'total_episodes'  => $length,
         ]);
-    }
-
-    private function refreshTitleCache(Title $title): void {
-        Cache::put("title:{$this->title_id}", $title->load('genres'), 3600);
-        Log::debug('[ProcessTitle] Title cache refreshed', ['title_id' => $this->title_id]);
     }
 }

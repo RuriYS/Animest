@@ -9,42 +9,53 @@ use Illuminate\Support\Facades\Cache;
 
 class TitleController extends ControllerAbstract {
     public function show(Request $request, string $id) {
-        $process = $request->boolean('p') ?? false;
-        $refresh = $request->boolean('r') ?? false;
+        $process = (boolean) $request->boolean('p');
+        $refresh = (boolean) $request->boolean('r');
 
-        $title = Cache::remember("title:{$id}", 3600, function () use ($id) {
-            return Title::with('genres')->find($id);
-        });
-
-        if (!$title) {
-            $result = null;
-            if ($process) {
-                ProcessTitle::dispatch($id, $process, $refresh)->onQueue('high');
-            } else {
-                ProcessTitle::dispatchSync($id, $process, false);
-                $result = Title::with('genres')->find($id);
-            }
-            return response()->json([
-                'message' => $process ? 'Title not found. Adding to queue.' : ($result ? 'Success' : 'Not found'),
-                'query'   => $id,
-                'result'  => $result,
-            ], $process ? 202 : ($result ? 200 : 404));
-        }
+        $title = $this->getTitle($id, $process, $refresh);
 
         return response()->json([
-            'errors' => null,
-            'query'  => $id,
-            'result' => $title->toArray(),
-        ]);
+            'process' => $process,
+            'refresh' => $refresh,
+            'message' => $title,
+        ], $process ? 202 : ($title ? 200 : 404));
     }
 
-    public function process(Request $request, string $id) {
-        $process_eps = $request->boolean('eps', true);
-        $refresh_eps = $request->boolean('refresh_eps', true);
+    private function getTitle($id, $process, $refresh) {
+        $key = "title:$id";
 
-        ProcessTitle::dispatch($id, $process_eps, $refresh_eps)->onQueue('high');
-        return response()->json([
-            'message' => 'Job dispatched',
-        ]);
+        if ($refresh) {
+            Cache::forget($key);
+        }
+
+        if ($process) {
+            ProcessTitle::dispatch($id, true, $refresh)->onQueue('high') ? ['result' => null, 'status' => 'dispatched'] : null;
+            Cache::forget($key);
+            return null;
+        }
+
+        $now = now();
+        $ttl = now()->addHours(4);
+
+        $payload = Cache::remember($key, $ttl, function () use ($id, $now, $ttl) {
+            $result = Title::with('genres')->find($id);
+            if (!$result) {
+                ProcessTitle::dispatchSync($id);
+                $result = Title::with('genres')->find($id);
+            }
+            return [
+                'result'     => $result,
+                'created_at' => $now,
+                'ttl'        => floor($now->diffInSeconds($ttl)),
+            ];
+        });
+
+        $age = floor($payload['created_at']->diffInSeconds(now()));
+        unset($payload['created_at']);
+
+        return [
+            ...$payload,
+            'age' => $age,
+        ];
     }
 }

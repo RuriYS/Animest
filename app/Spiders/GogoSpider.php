@@ -51,9 +51,6 @@ class GogoSpider extends BasicSpider {
         $uri      = $params ? "$base_url?$params" : $base_url;
         $path     = parse_url($uri, PHP_URL_PATH);
         $paths    = array_filter(explode("/", $path));
-
-        Log::debug("[GogoSpider] URI: $uri");
-
         $requests = [];
 
         $requests[] = isset($paths[1]) ? match ($paths[1]) {
@@ -160,8 +157,8 @@ class GogoSpider extends BasicSpider {
             ]);
         }
     }
-    /**
-     * @inheritDoc
-     */
-    public function parse(Response $response): Generator {}
+
+    public function parse(Response $response): Generator {
+        yield null;
+    }
 }

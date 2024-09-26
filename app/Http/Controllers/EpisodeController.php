@@ -2,75 +2,58 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\ProcessEpisode;
-use App\Jobs\ProcessTitle;
 use App\Models\Episode;
-use App\Models\Title;
-use App\Utils\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class EpisodeController extends ControllerAbstract {
-    public function index(Request $request, string $title_id) {
-        $title = Title::find($title_id);
+    public function show(Request $request, string $title_id, int|string|null $index = 0) {
+        $process = (boolean) $request->boolean('p');
+        $refresh = (boolean) $request->boolean('r');
 
-        if (!$title || $request->boolean('refresh')) {
-            ProcessTitle::dispatch($title_id)->onQueue('high');
-            return response()->json([
-                'query'    => $title_id,
-                'exists'   => false,
-                'episodes' => [],
-                'message'  => 'Title not found. Adding to queue.',
-            ], 202);
-        }
-
-        $episodes = Cache::remember("episodes:{$title_id}", 3600, function () use ($title_id) {
-            return Episode::where('title_id', $title_id)->get();
-        });
-
-        if ($episodes->isEmpty() || $episodes->count() < $title->length) {
-            ProcessTitle::dispatch($title_id, true, false)->onQueue('high');
-            return response()->json([
-                'query'    => $title_id,
-                'exists'   => true,
-                'episodes' => $episodes,
-                'message'  => 'Episode list may be incomplete. Adding to queue.',
-            ], 202);
-        }
+        $episodes = $this->getEpisode($request, $title_id, $process, $refresh, $index);
 
         return response()->json([
-            'query'    => $title_id,
-            'exists'   => true,
-            'episodes' => $episodes,
-        ]);
+            'process' => $process,
+            'refresh' => $refresh,
+            'message' => $episodes,
+        ], $process ? 202 : ($episodes ? 200 : 404));
     }
 
-    public function show(string $title_id, string $index) {
-        $id_formats = [
-            "{$title_id}-episode-{$index}",
-            "{$title_id}-{$index}",
-        ];
+    private function getEpisode($request, $title_id, $process, $refresh, $index) {
+        $key = "episode:$title_id:$index";
 
-        $episode = Cache::remember("episode:{$id_formats[0]}", 3600, function () use ($id_formats) {
-            return Episode::whereIn('id', $id_formats)->first();
-        });
-
-        if (!$episode && $title_id && $index) {
-            ProcessEpisode::dispatch($id_formats[0], $title_id)->onQueue('high');
-            return response()->json([
-                'query'   => $title_id,
-                'index'   => $index,
-                'exists'  => false,
-                'episode' => null,
-                'message' => 'Episode has been queued.',
-            ], 202);
+        if ($refresh) {
+            Cache::forget($key);
         }
 
-        return response()->json([
-            'query'   => $title_id,
-            'index'   => $index,
-            'exists'  => (bool) $episode,
-            'episode' => $episode,
-        ]);
+        if ($process) {
+            app(TitleController::class)->show($request, $title_id);
+            Cache::forget($key);
+            return null;
+        }
+
+        $now = now();
+        $ttl = now()->addHours(4);
+
+        $payload = Cache::remember($key, $ttl, function () use ($title_id, $index, $now, $ttl) {
+            $query = Episode::where('title_id', $title_id);
+            $data = $index ? $query->where('episode_index', $index)->first() : $query->get();
+
+            return [
+                'result'     => $data,
+                'created_at' => $now,
+                'ttl'        => floor($now->diffInSeconds($ttl)),
+            ];
+        });
+
+        $age = floor($payload['created_at']->diffInSeconds(now()));
+        unset($payload['created_at']);
+
+        return [
+            ...$payload,
+            'age' => $age,
+        ];
     }
 }

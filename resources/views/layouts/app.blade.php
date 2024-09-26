@@ -22,7 +22,7 @@
 </head>
 
 <body style="background-color: black;">
-    @if(app()->environment('local', 'dev'))
+    @if(app()->environment('local', 'development'))
         <div id="debug">
             {{ $envInfo ?? 'Environment info not available' }}
         </div>

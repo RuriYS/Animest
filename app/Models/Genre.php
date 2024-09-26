@@ -11,9 +11,10 @@ class Genre extends Model {
     use HasFactory;
     use HasUuids;
 
-    public $timestamps = false;
-
+    public    $timestamps = false;
     protected $primaryKey = 'id';
+    protected $hidden     = ['pivot'];
+
 
     public function titles(): BelongsToMany {
         return $this->belongsToMany(

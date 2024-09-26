@@ -20,10 +20,7 @@ Route::prefix('/spider')
 
 Route::prefix('/episodes')
     ->group(function () {
-        Route::get('/{title_id}', [EpisodeController::class, 'index']);
-        Route::get('/{title_id}/{index}', [EpisodeController::class, 'show']);
-        Route::post('/{title_id}/{index}', [EpisodeController::class, 'view']);
-        Route::get('/{title_id}/{index}/process', [EpisodeController::class, 'process']);
+        Route::get('/{title_id}/{index?}', [EpisodeController::class, 'show']);
     });
 
 Route::prefix('/titles')

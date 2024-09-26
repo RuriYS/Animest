@@ -4,7 +4,6 @@ namespace App\Spiders;
 
 use App\Utils\Helper;
 use Generator;
-use Illuminate\Support\Facades\Log;
 use RoachPHP\Http\Request;
 use RoachPHP\Http\Response;
 use RoachPHP\Spider\BasicSpider;

@@ -13,7 +13,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RoachPHP\Roach;
@@ -90,13 +89,10 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
     private function createOrUpdateEpisode(array $results): void {
         $episodeData = $this->prepareEpisodeData($results);
 
-        $episode = Episode::updateOrCreate(
+        Episode::updateOrCreate(
             ['id' => $episodeData['id']],
             $episodeData,
         );
-
-        $this->refreshEpisodeCache($episode);
-        $this->refreshEpisodesListCache();
 
         Log::debug('[ProcessEpisode] Episode updated', [$episodeData]);
     }
@@ -118,16 +114,5 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
 
     private function findEpisodeMeta(array $episodes, string $episodeId): ?array {
         return collect($episodes)->firstWhere('episode_id', $episodeId) ?? null;
-    }
-
-    private function refreshEpisodeCache(Episode $episode): void {
-        Cache::put("episode:{$episode->id}", $episode, 3600);
-        Log::debug('[ProcessEpisode] Episode cache refreshed', ['episode_id' => $episode->id]);
-    }
-
-    private function refreshEpisodesListCache(): void {
-        $episodes = Episode::where('title_id', $this->title_id)->get();
-        Cache::put("episodes:{$this->title_id}", $episodes, 3600);
-        Log::debug('[ProcessEpisode] Episodes list cache refreshed', ['title_id' => $this->title_id, 'episode_count' => $episodes->count()]);
     }
 }

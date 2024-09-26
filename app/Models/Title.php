@@ -12,6 +12,7 @@ class Title extends Model {
     protected $table      = 'titles';
     protected $primaryKey = 'id';
     protected $keyType    = 'string';
+    protected $hidden     = ['pivot'];
 
     protected $fillable = [
         'alias',
@@ -53,6 +54,8 @@ class Title extends Model {
             'title_genre',
             'title_id',
             'genre_id',
-        )->using(TitleGenre::class);
+        )
+            ->using(TitleGenre::class)
+            ->without('pivot');
     }
 }
