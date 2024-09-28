@@ -2,32 +2,16 @@
 
 use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\MainController;
-use App\Http\Controllers\ProxyController;
 use App\Http\Controllers\SearchController;
-use App\Http\Controllers\TitleController;
-use App\Http\Controllers\EpisodeController;
+use App\Http\Controllers\MediaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/test', [MainController::class, 'test']);
 
-Route::prefix('/spider')
-    ->group(function () {
-        Route::prefix('/vidstream')
-            ->group(function () {
-                Route::get('{episode_id}/get', [EpisodeController::class, 'get']);
-            });
-    });
-
-Route::prefix('/episodes')
-    ->group(function () {
-        Route::get('/{title_id}/{index?}', [EpisodeController::class, 'show']);
-    });
-
 Route::prefix('/titles')
     ->group(function () {
-        Route::get('/{title_id}', [TitleController::class, 'show']);
-        Route::get('/{title_id}/process/{params?}', [TitleController::class, 'process'])
-            ->where('params', '.*');
+        Route::get('/{title_id}', [MediaController::class, 'show']);
+        Route::get('/{title_id}/episodes/{index?}', [MediaController::class, 'show']);
     });
 
 Route::prefix('/search')

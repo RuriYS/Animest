@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Spiders\GogoSpider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use RoachPHP\Roach;
 
 class SearchController extends ControllerAbstract {
@@ -12,7 +13,7 @@ class SearchController extends ControllerAbstract {
         $query    = $request->input('q') ?? '';
         $page     = $request->input('p') ?? '';
         $sort     = $request->input('s') ?? 'title_az';
-        $limit    = $request->integer('limit') ?? 20;
+        $limit    = $request->integer('l') ?? 20;
         $cacheKey = "search_results:{$query}:{$page}:{$sort}";
 
         $args = [
@@ -24,7 +25,7 @@ class SearchController extends ControllerAbstract {
             'limit'  => $limit,
         ];
 
-        $results = Cache::remember(
+        $data = Cache::remember(
             $cacheKey,
             now()->addHours(4),
             function () use ($args) {
@@ -50,8 +51,8 @@ class SearchController extends ControllerAbstract {
 
         return response()->json([
             'query' => $query,
-            'count' => count($results),
-            ...$results,
+            'count' => count($data['results']),
+            ...$data,
         ]);
     }
 }

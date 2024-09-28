@@ -6,9 +6,8 @@ use App\Models\Episode;
 use App\Models\Genre;
 use App\Models\Title;
 use App\Spiders\GogoSpider;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -16,8 +15,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RoachPHP\Roach;
 
-class ProcessTitle implements ShouldQueue, ShouldBeUnique {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+class ProcessTitle implements ShouldBeUnique {
+    use Dispatchable, InteractsWithQueue, SerializesModels;
 
     protected string $title_id;
 
@@ -39,7 +38,7 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
         return 3600;
     }
 
-    public function handle(): void {
+    public function handle() {
         $title_id = str($this->title_id)->toString();
 
         Log::debug(
@@ -62,15 +61,16 @@ class ProcessTitle implements ShouldQueue, ShouldBeUnique {
                 return;
             }
 
-            DB::transaction(function () use ($result) {
+            return DB::transaction(function () use ($result) {
                 $title = $this->updateTitle($result);
                 $this->processGenres($result['genres'] ?? [], $title);
 
                 if ($this->process_eps) {
                     $this->processEpisodes($result['alias'], $result['length']);
                 }
-            });
 
+                return $title->toArray();
+            });
         } catch (\Exception $e) {
             Log::error(
                 '[ProcessTitle] Job failed',
