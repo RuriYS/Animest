@@ -29,7 +29,7 @@ class MediaController extends ControllerAbstract {
         $this->dispatch = (bool) $request->boolean('d');
         $this->sync     = (bool) $request->boolean('s');
 
-        if ($this->refresh) {
+        if ($this->refresh || $this->dispatch) {
             $this->forget();
         }
 
@@ -49,6 +49,7 @@ class MediaController extends ControllerAbstract {
 
     protected function makeResponse() {
         $cached = Cache::get($this->key);
+
         if ($cached) {
             $age = floor($cached['created_at']->diffInSeconds(now()));
             unset($cached['created_at']);
@@ -61,7 +62,6 @@ class MediaController extends ControllerAbstract {
 
         $cache_rule = in_array(true, [
             $this->refresh,
-            $this->dispatch,
             $this->sync,
             empty($result['data']) && $status,
         ]);
@@ -88,12 +88,12 @@ class MediaController extends ControllerAbstract {
         ];
     }
 
-    protected function processTitle() {
+    protected function processTitle($process_eps = false, $refresh_eps = false) {
         $result = Title::find($this->title_id);
         $status = false;
 
         if ($this->dispatch) {
-            $title  = (array) ProcessTitle::dispatchSync($this->title_id);
+            $title  = (array) ProcessTitle::dispatchSync($this->title_id, $process_eps, $refresh_eps);
             $status = !empty($title);
 
         } elseif ($this->sync || empty($result)) {
@@ -108,8 +108,8 @@ class MediaController extends ControllerAbstract {
         $title = Title::find($this->title_id);
         $query = Episode::where('title_id', $this->title_id);
 
-        if (!$title) {
-            $this->processTitle();
+        if (!$title || $this->dispatch) {
+            $this->processTitle(true, true);
         }
 
         $data = ($this->episodeIndex !== null) ?
@@ -118,7 +118,7 @@ class MediaController extends ControllerAbstract {
 
         $status = false;
 
-        if (empty($data)) {
+        if (empty($data) || $this->sync) {
             $title = ProcessTitle::dispatchSync($this->title_id, true, true);
             $data  = null;
 

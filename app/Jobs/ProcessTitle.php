@@ -7,7 +7,6 @@ use App\Models\Genre;
 use App\Models\Title;
 use App\Spiders\GogoSpider;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -96,10 +95,22 @@ class ProcessTitle implements ShouldBeUnique {
     }
 
     private function updateTitle(array $result): Title {
-        $titleData = array_diff_key($result, array_flip(['genres']));
-        $title     = Title::updateOrCreate(['id' => $result['id']], $titleData);
+        try {
+            $titleData       = array_diff_key($result, array_flip(['genres']));
+            $titleData['id'] = $result['id'];
 
-        Log::debug('[ProcessTitle] Title updated', ['title_id' => $title->id]);
+            Title::upsert(
+                [$titleData],
+                ['id'],
+                array_keys(array_diff_key($titleData, ['id' => 1])),
+            );
+
+            $title = Title::find($result['id']);
+            Log::debug('[ProcessTitle] Title updated', ['title_id' => $title->id]);
+        } catch (\Throwable $th) {
+            Log::error('[ProcessTitle] Could not update the title', ['error' => $th->getMessage(), 'result_data' => $result]);
+            throw new \Exception("Could not update the title: " . $th->getMessage());
+        }
         return $title;
     }
 
@@ -150,10 +161,13 @@ class ProcessTitle implements ShouldBeUnique {
             ]);
         }
 
-        Log::debug("[ProcessTitle] Episode jobs dispatched", [
-            'alias'           => $alias,
-            'dispatched_jobs' => count($episodesToProcess),
-            'total_episodes'  => $length,
-        ]);
+        if ($episodesToProcess > 0) {
+            Log::debug("[ProcessTitle] Dispatched episodes", [
+                'alias'           => $alias,
+                'dispatched_jobs' => count($episodesToProcess),
+                'total_episodes'  => $length,
+            ]);
+        }
+
     }
 }
