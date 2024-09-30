@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AjaxController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\MALController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\MediaController;
 use Illuminate\Support\Facades\Route;
@@ -25,4 +26,9 @@ Route::prefix('/search')
 Route::prefix('/ajax')
     ->group(function () {
         Route::get('/popular', [AjaxController::class, 'popularReleases']);
+    });
+
+Route::prefix('/mal')
+    ->group(function () {
+        Route::get('/search', [MALController::class, 'search']);
     });
