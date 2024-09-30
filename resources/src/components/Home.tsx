@@ -1,6 +1,7 @@
 import React from 'react';
-import FeaturedBanner from './FeaturedBanner';
-import Section from './Section';
+
+import Section from '@/components/Section';
+import FeaturedBanner from '@/components/FeaturedBanner';
 
 const Home = () => {
     return (

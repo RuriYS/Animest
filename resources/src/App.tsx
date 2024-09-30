@@ -1,10 +1,10 @@
 import { BrowserRouter } from 'react-router-dom';
-import React, { Suspense, lazy } from 'react';
-import ReactDOM from 'react-dom/client';
-import Main from '@/Main';
-import GlobalStyles from './styles/GlobalStyles';
-import MainContainer from './elements/MainContainer';
 import { Header, Footer, LoadingFallback } from '@/components';
+import GlobalStyles from '@/styles/GlobalStyles';
+import MainContainer from '@/elements/MainContainer';
+import React, { Suspense } from 'react';
+import ReactDOM from 'react-dom/client';
+import Routes from '@/Routes';
 
 const App = () => {
     return (
@@ -12,7 +12,7 @@ const App = () => {
             <Suspense fallback={<LoadingFallback />}>
                 <MainContainer>
                     <Header />
-                    <Main />
+                    <Routes />
                     <Footer />
                 </MainContainer>
             </Suspense>

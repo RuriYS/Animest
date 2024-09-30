@@ -1,10 +1,11 @@
+import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Play, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Link, useNavigate } from 'react-router-dom';
 import React from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+
 import { Constraint } from '@/elements';
+import { Button } from '@/components/ui/button';
 
 interface Result {
     id: string;

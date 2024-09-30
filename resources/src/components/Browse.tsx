@@ -1,7 +1,9 @@
-import { Constraint, ContentContainer, SearchResult } from '@/elements';
-import { Loader2, Search, Sliders } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Loader2, Sliders } from 'lucide-react';
+import tw, { styled } from 'twin.macro';
+import { debounce } from 'lodash';
+import axios from 'axios';
+
 import {
     Select,
     SelectContent,
@@ -9,17 +11,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import tw, { styled } from 'twin.macro';
-import axios from 'axios';
-import { debounce } from 'lodash';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import { Constraint, ContentContainer, SearchResult } from '@/elements';
 
 const ResultContainer = styled.div`
     ${tw`p-0 md:p-4`}
@@ -40,7 +41,7 @@ interface Result {
     year: string;
 }
 
-export default function Component() {
+export default function () {
     const [exactMatch, setExactMatch] = useState(false);
     const [searchResults, setSearchResults] = useState<Result[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -91,8 +92,8 @@ export default function Component() {
     return (
         <Constraint>
             <ContentContainer>
-                <title>Browse | Animest</title>
-                <h1 className='text-xl m-auto'>Browse titles</h1>
+                <title>Browse Titles | Animest</title>
+                <h1 className='text-xl m-auto'>Browse Titles</h1>
                 <div className='w-full max-w-3xl mx-auto p-4 space-y-4'>
                     <div className='flex space-x-2'>
                         <div className='flex-grow'>

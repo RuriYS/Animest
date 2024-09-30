@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from '@emotion/styled';
 import tw from 'twin.macro';
 import {
@@ -9,9 +9,9 @@ import {
     PlayerWrapper,
     WatchInfoContainer,
 } from '@/elements';
-import useEpisodes from '@/hooks/useEpisodes';
 import moment from 'moment';
-import { SortMode } from 'types';
+import { EpisodeProps, SortMode } from 'types';
+import useTitle from '@/hooks/useTitle';
 
 const WatchContainer = styled.div`
     ${tw`flex flex-col gap-y-8 w-full bg-black`}
@@ -19,20 +19,28 @@ const WatchContainer = styled.div`
 
 export default function Watch() {
     const navigate = useNavigate();
-    const [args] = useSearchParams();
     const { id, index } = useParams<{
         id: string;
         index?: string;
     }>();
-    const { loading, currentEpisode, episodes, meta, error, header, message } =
-        useEpisodes(id!, index, args);
+    const {
+        loading,
+        episodes,
+        title: meta,
+        error,
+        header,
+        message,
+    } = useTitle(id!);
     const [currentPage, setCurrentPage] = useState(1);
     const [sortMode, setSort] = useState<SortMode>('index-desc');
+    const [currentEpisode, setCurrentEpisode] = useState<EpisodeProps | null>(
+        null,
+    );
     const episodesPerPage = 10;
 
     useEffect(() => {
         if (!index) {
-            navigate(`/watch/${id}/episode/1/${args}`, { replace: true });
+            navigate(`/watch/${id}/episode/1`, { replace: true });
         }
     }, [id, index, navigate]);
 
@@ -87,7 +95,17 @@ export default function Watch() {
         setSort(sort);
     }, []);
 
-    if (loading || (error && message)) {
+    useEffect(() => {
+        if (episodes) {
+            const episode =
+                episodes?.find(
+                    (episode) => episode.episode_index === (index ?? '1'),
+                ) ?? episodes[0];
+            return setCurrentEpisode(episode);
+        }
+    }, [episodes, index]);
+
+    if (loading || !sortedEpisodes || !currentEpisode) {
         return (
             <WatchInfoContainer
                 state={error ? 'error' : 'loading'}

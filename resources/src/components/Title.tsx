@@ -1,6 +1,6 @@
 import React from 'react';
-import Constraint from '../elements/Constraint';
 import { ContentContainer } from '@/elements';
+import Constraint from '@/components/Constraint';
 
 const Title = () => {
     return (

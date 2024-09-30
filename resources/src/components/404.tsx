@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import ContentContainer from './ContentContainer';
-import Constraint from './Constraint';
 import React from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import Constraint from '@/components/Constraint';
+import ContentContainer from '@/components/ContentContainer';
 
-const RedirectToRickroll = () => {
+const Rickroll = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -16,7 +16,7 @@ const RedirectToRickroll = () => {
     return null;
 };
 
-export default function Component() {
+export default function () {
     return (
         <Constraint>
             <ContentContainer>
@@ -26,7 +26,7 @@ export default function Component() {
                         <p className='text-lg underline'>Take me home.</p>
                     </Link>
                 </div>
-                <RedirectToRickroll />
+                <Rickroll />
             </ContentContainer>
         </Constraint>
     );

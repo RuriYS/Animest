@@ -1,4 +1,5 @@
 export interface MetaProps {
+    alias: string;
     id: string;
     title: string;
     language: 'SUB' | 'DUB';

@@ -1,13 +1,10 @@
 import React from 'react';
-import { Constraint, ContentContainer } from '../elements';
-import { styled } from 'twin.macro';
+import { Constraint, ContentContainer } from '@/elements';
 
 const Queues = () => {
     return (
         <Constraint>
-            <ContentContainer>
-                <h1>Queues</h1>
-            </ContentContainer>
+            <ContentContainer></ContentContainer>
         </Constraint>
     );
 };

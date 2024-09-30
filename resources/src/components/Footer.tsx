@@ -1,14 +1,10 @@
-import React from 'react';
-import { FaTelegram, FaDiscord, FaYoutube, FaInstagram } from 'react-icons/fa';
-import Constraint from '../elements/Constraint';
-import styled from '@emotion/styled';
+import { FaDiscord } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import styled from '@emotion/styled';
 import tw from 'twin.macro';
+import React from 'react';
 
-interface FooterLinkProps {
-    bold?: boolean;
-    small?: boolean;
-}
+import Constraint from '@/components/Constraint';
 
 const FooterContainer = styled.footer`
     ${tw`w-full bg-black text-gray-400 p-4 flex justify-between`}

@@ -9,10 +9,12 @@ import Search from './Browse';
 import Terms from './Terms';
 import Section from './Section';
 import Watch from './Watch';
+import FourOFour from './404';
 
 export {
-    Title as Anime,
+    Title,
     Footer,
+    FourOFour,
     Header,
     Home,
     LoadingFallback,

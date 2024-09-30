@@ -1,10 +1,11 @@
-import React, { useRef, useState } from 'react';
-import { Link, To, useLocation, useNavigate } from 'react-router-dom';
-import tw from 'twin.macro';
-import styled from '@emotion/styled';
-import MorphableSearchBar from '../elements/MorphableSearchBar';
-import { FaBars } from 'react-icons/fa';
 import { CSSTransition } from 'react-transition-group';
+import React, { useRef, useState } from 'react';
+import { Link, To } from 'react-router-dom';
+import { FaBars } from 'react-icons/fa';
+import styled from '@emotion/styled';
+import tw from 'twin.macro';
+
+import MorphableSearchBar from '@/elements/MorphableSearchBar';
 
 const HeaderContainer = styled.div`
     ${tw`fixed h-12 w-full z-20 bg-gradient-to-b from-black to-transparent`}

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Constraint from '../elements/Constraint';
-import { Link } from 'react-router-dom';
 import { FaCirclePlay } from 'react-icons/fa6';
 import { FaInfoCircle } from 'react-icons/fa';
-import Button from '../elements/Button';
+import { Link } from 'react-router-dom';
+
+import Button from '@/elements/Button';
+import Constraint from '@/components/Constraint';
 
 const FeaturedBanner = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
