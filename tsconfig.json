@@ -1,18 +1,24 @@
 {
     "compilerOptions": {
         "baseUrl": "./resources",
-        "moduleResolution": "node",
-        "target": "es5",
-        "module": "esnext",
-        "strict": true,
-        "jsx": "react",
         "esModuleInterop": true,
-        "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
+        "jsx": "react",
+        "module": "esnext",
+        "moduleResolution": "node",
         "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "target": "es5",
         "paths": {
-            "@/*": [ "./src/*" ]
+            "@/*": [ "./src/*" ],
+            "@/types/*": [ "./types/* "],
         }
     },
-    "include": [ "resources/src", "resources/types" ]
+    "include": [
+        "resources/src",
+        "resources/types"
+    ]
 }
