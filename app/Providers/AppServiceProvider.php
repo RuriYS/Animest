@@ -9,6 +9,10 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider {
     public function register(): void {
+        if ($this->app->environment('local')) {
+            $this->app->register(\Laravel\Telescope\TelescopeServiceProvider::class);
+            $this->app->register(TelescopeServiceProvider::class);
+        }
         $this->app->singleton(Client::class, function ($app) {
             return new Client([
                 'User-Agent' => config('app.user_agent'),
