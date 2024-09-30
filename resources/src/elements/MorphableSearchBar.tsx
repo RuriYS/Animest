@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import tw from 'twin.macro';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import React from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { Link } from 'react-router-dom';

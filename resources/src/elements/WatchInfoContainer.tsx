@@ -1,7 +1,7 @@
 import { Loader2, AlertCircle } from 'lucide-react';
 import React from 'react';
-import Constraint from '../components/Constraint';
-import ContentContainer from '../components/ContentContainer';
+import Constraint from '@/components/Constraint';
+import ContentContainer from '@/components/ContentContainer';
 
 export default function WatchInfoContainer({
     state,

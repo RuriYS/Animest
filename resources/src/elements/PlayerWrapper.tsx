@@ -7,12 +7,7 @@ import {
     MediaProviderAdapter,
     MediaProviderChangeEvent,
 } from '@vidstack/react';
-import Hls, {
-    HlsConfig,
-    LoaderCallbacks,
-    LoaderConfiguration,
-    LoaderContext,
-} from 'hls.js';
+import Hls, { HlsConfig } from 'hls.js';
 import {
     defaultLayoutIcons,
     DefaultVideoLayout,

@@ -1,4 +1,3 @@
-import { ReactProps } from '@vidstack/react/types/vidstack';
 import moment from 'moment';
 import React from 'react';
 
