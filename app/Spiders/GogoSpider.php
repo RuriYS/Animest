@@ -147,9 +147,10 @@ class GogoSpider extends BasicSpider {
 
         $href         = trim($response->filter('#episode_related a')->attr('href'));
         $id_fragments = Helper::parseEpisodeID($href);
-
         if ($id_fragments) {
-            yield $this->item($id_fragments);
+            yield $this->item([
+                'alias' => $id_fragments['alias'],
+            ]);
         } else {
             Log::warning("Could not extract alias ID: $href");
             yield $this->item([

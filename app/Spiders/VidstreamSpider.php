@@ -12,7 +12,7 @@ use RoachPHP\Http\Response;
 use RoachPHP\Spider\BasicSpider;
 use Symfony\Component\DomCrawler\Crawler;
 
-class VidstreamVideoSpider extends BasicSpider {
+class VidstreamSpider extends BasicSpider {
     protected function initialRequests(): array {
         return [
             new Request(
