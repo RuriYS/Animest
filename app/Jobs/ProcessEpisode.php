@@ -2,11 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Events\EpisodeProcessed;
 use App\Models\Episode;
 use App\Models\Title;
-use App\Spiders\VidstreamVideoSpider;
+use App\Spiders\VidstreamSpider;
 use App\Utils\Helper;
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -54,11 +54,15 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
             }
 
             DB::transaction(function () use ($results) {
-                $this->createOrUpdateTitle($this->title_id);
-                $this->createOrUpdateEpisode($results);
+                $episode = $this->updateEpisode($results);
+
+                if ($episode) {
+                    event(new EpisodeProcessed($episode));
+                    Log::debug('[ProcessEpisode] Job finished', ['episode' => $episode]);
+                }
             });
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Log::error('[ProcessEpisode] Job failed', [
                 'episode_id' => $this->episode_id,
                 'title_id'   => $this->title_id,
@@ -69,7 +73,7 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
 
     private function runSpider(): array {
         $items = Roach::collectSpider(
-            VidstreamVideoSpider::class,
+            VidstreamSpider::class,
             context: [
                 'base_url' => config('app.urls.vidstream'),
                 'id'       => $this->episode_id,
@@ -79,25 +83,22 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
         return array_merge(...array_map(fn($item) => $item->all(), $items));
     }
 
-    private function createOrUpdateTitle(string $titleId): void {
-        if (!Title::where('id', $titleId)->exists()) {
-            Log::debug('[ProcessEpisode] Creating title', ['title_id' => $titleId]);
-            ProcessTitle::dispatchSync($titleId);
+    private function updateEpisode(array $results) {
+        try {
+            $data = $this->createEpisode($results);
+
+            $episode = Episode::updateOrCreate(
+                ['id' => $data['id']],
+                $data,
+            );
+
+            return $episode;
+        } catch (\Throwable $th) {
+            Log::error('[ProcessEpisode] Failed to update episode', ['error' => $th->getMessage()]);
         }
     }
 
-    private function createOrUpdateEpisode(array $results): void {
-        $episodeData = $this->prepareEpisodeData($results);
-
-        Episode::updateOrCreate(
-            ['id' => $episodeData['id']],
-            $episodeData,
-        );
-
-        Log::debug('[ProcessEpisode] Episode updated', [$episodeData]);
-    }
-
-    private function prepareEpisodeData(array $results): array {
+    private function createEpisode(array $results): array {
         $id_fragments = Helper::parseEpisodeID($results['episode_id'] ?? '');
         $meta         = $this->findEpisodeMeta($results['episodes'] ?? [], $results['episode_id'] ?? '');
 
