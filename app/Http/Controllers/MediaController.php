@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessTitle;
 use App\Models\Title;
 use App\Models\Episode;
+use App\Utils\CacheUtils;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -48,16 +49,14 @@ class MediaController extends ControllerAbstract {
     }
 
     protected function makeResponse() {
-        $cached = Cache::get($this->key);
+        $cached = CacheUtils::getMediaCache($this->key);
 
         if ($cached) {
-            $age = floor($cached['created_at']->diffInSeconds(now()));
-            unset($cached['created_at']);
-
-            return [...$cached, 'age' => $age];
+            return $cached;
         }
 
         $result = $this->isEpisode ? $this->processEpisode() : $this->processTitle();
+
         $status = !empty($result['data']) || $result['status'];
 
         $cache_rule = in_array(true, [
@@ -66,25 +65,15 @@ class MediaController extends ControllerAbstract {
             empty($result['data']) && $status,
         ]);
 
-        $ttl = $cache_rule ? null : floor(now()->diffInSeconds(now()->addHours(4)));
-
-        $response = [
-            'created_at' => now(),
-            'result'     => $result['data'],
-            'status'     => $status,
-            'ttl'        => $ttl ?: null,
-        ];
-
-        if ($cache_rule === false) {
-            Cache::put($this->key, $response, $ttl);
+        if (!$cache_rule) {
+            CacheUtils::updateMediaCache($this->key, $result['data']);
         }
 
-        $age = $cache_rule ? null : 0;
-        unset($response['created_at']);
-
         return [
-            ...$response,
-            'age' => $age,
+            'result' => $result['data'],
+            'status' => $status,
+            'ttl'    => $cache_rule ? null : floor(now()->diffInSeconds(now()->addHours(4))),
+            'age'    => $cache_rule ? null : 0,
         ];
     }
 
