@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 
 class CacheUtils {
-    public static function updateMediaCache(string $key, Model|Collection $data): void {
+    public static function updateMediaCache(string $key, Model|Collection|array $data): void {
         $ttl = floor(now()->diffInSeconds(now()->addHours(4)));
 
         $cacheData = [
