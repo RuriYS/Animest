@@ -85,7 +85,11 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
 
     private function updateEpisode(array $results) {
         try {
-            $data = $this->createEpisode($results);
+            $data = $this->prepareEpisode($results);
+
+            if (!isset($data['id'])) {
+                throw new \Exception('Missing ID for episode: ' . json_encode($data));
+            }
 
             $episode = Episode::updateOrCreate(
                 ['id' => $data['id']],
@@ -98,19 +102,21 @@ class ProcessEpisode implements ShouldQueue, ShouldBeUnique {
         }
     }
 
-    private function createEpisode(array $results): array {
+    private function prepareEpisode(array $results): array {
         $id_fragments = Helper::parseEpisodeID($results['episode_id'] ?? '');
         $meta         = $this->findEpisodeMeta($results['episodes'] ?? [], $results['episode_id'] ?? '');
 
-        return [
-            'id'            => $results['episode_id'] ?? '',
-            'alias'         => $id_fragments['alias'] ?? '',
-            'episode_index' => $id_fragments['index'] ?? null,
+        $data = [
+            'id'            => $results['episode_id'],
+            'alias'         => $id_fragments['alias'],
+            'episode_index' => $id_fragments['index'],
             'download_url'  => $results['download_url'] ?? null,
             'title_id'      => $this->title_id,
             'upload_date'   => $meta['date_added'] ?? null,
             'video'         => $results['stream_data'] ?? null,
         ];
+
+        return $data;
     }
 
     private function findEpisodeMeta(array $episodes, string $episodeId): ?array {

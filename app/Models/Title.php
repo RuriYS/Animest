@@ -7,12 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Title extends Model {
-    public $incrementing = false;
-
-    protected $table      = 'titles';
-    protected $primaryKey = 'id';
-    protected $keyType    = 'string';
-    protected $hidden     = ['pivot'];
+    public    $incrementing = false;
+    protected $primaryKey   = 'id';
+    protected $keyType      = 'string';
+    protected $table        = 'titles';
+    protected $hidden       = ['pivot'];
 
     protected $fillable = [
         'alias',

@@ -5,8 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class Episode extends Model {
-    protected $table      = 'episodes';
-    protected $primaryKey = 'id';
+    public    $incrementing = false;
+    protected $primaryKey   = 'id';
+    protected $keyType      = 'string';
+    protected $table        = 'episodes';
+    protected $hidden       = ['pivot'];
 
     protected $fillable = [
         'id',
