@@ -21,10 +21,10 @@ class EpisodeListener implements ShouldQueue {
             CacheUtils::updateMediaCache($singleKey, $episode);
             Log::debug("[EpisodeListener] Episode cache updated", ['key' => $singleKey]);
 
-            $listKey     = "episodes:$titleId";
-            $episodeList = $episode->where('title_id', $titleId)->get();
-            CacheUtils::updateMediaCache($listKey, $episodeList);
-            Log::debug("[EpisodeListener] Episode list cache updated", ['key' => $listKey]);
+            // $listKey     = "episodes:$titleId";
+            // $episodeList = $episode->where('title_id', $titleId)->get();
+            // CacheUtils::updateMediaCache($listKey, $episodeList);
+            // Log::debug("[EpisodeListener] Episode list cache updated", ['key' => $listKey]);
         }
     }
 }
