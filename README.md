@@ -4,22 +4,15 @@
 Animest is an anime scraper designed to efficiently gather anime data from various streaming sites. It organizes and maintains a comprehensive anime library, providing users with seamless access to the latest streams. Ideal for building your personal collection or staying updated with the latest releases, Animest streamlines the process of managing anime content.
 
 ## Source Libraries
+
 - GogoAnime
 - Vidstream
-
-
 
 ## Features
 
 - Scrapes from massive anime libraries
 - Scrapes video streams from different servers
 - Efficiently saves library to its own databases
-## Roadmap
-
-- ~~Database~~
-- Scraper optimizations (almost done)
-- Front-end
-- Server
 
 ## Prerequisites
 
@@ -35,11 +28,12 @@ Using composer
   composer install
   yarn install
 ```
-    
-## API Reference
-### Note: This is subject to change.
 
-#### Get the index of specific anime
+## API Reference
+
+**Note**: This is subject to change
+
+### Get the index of specific anime
 
 ```http
   GET /api/anime/${anime_id}
@@ -47,11 +41,11 @@ Using composer
 
 | Query       | Type     | Description                                  |
 | :---------- | :------- | :------------------------------------------- |
-| `anime_id ` | `string` | **Required**. Anime ID (eg; no-game-no-life) |
+| `anime_id` | `string` | **Required**. Anime ID (eg; no-game-no-life) |
 
-#### Response example
+Response example
 
-```
+```json
 {
     "id": "no-game-no-life",
     "episodes": [
@@ -74,10 +68,9 @@ Using composer
 | `anime_id` | `string` | **Required**. Anime ID                        |
 | `episode`  | `string` | **Required**. Episode index (eg; episode-1)   |
 
+Response example
 
-#### Response example
-
-```
+```json
 {
     "id": "no-game-no-life",
     "sources": [
@@ -95,5 +88,4 @@ Using composer
 
 ## Authors
 
-- [@RuriYoshinova](https://github.com/RuriYoshinova)
-
+- [@RuriXD](https://github.com/RuriXD)
