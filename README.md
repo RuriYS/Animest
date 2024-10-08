@@ -7,6 +7,7 @@ Animest is an anime scraper designed to efficiently gather anime data from vario
 
 - GogoAnime
 - Vidstream
+- MyAnimeList
 
 ## Features
 
@@ -16,9 +17,8 @@ Animest is an anime scraper designed to efficiently gather anime data from vario
 
 ## Prerequisites
 
-- PHP v8.3 (extensions: sodium, parallel, mongodb, igbinary, msgpack, redis)
+- PHP v8.3 (extensions: sodium, igbinary, msgpack, redis)
 - Node v22.x
-- Yarn v1.xx
 
 ## Installation
 
@@ -26,7 +26,7 @@ Using composer
 
 ```bash
   composer install
-  yarn install
+  yarn install && yarn build
 ```
 
 ## API Reference
