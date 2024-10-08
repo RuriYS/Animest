@@ -11,7 +11,7 @@ import {
 } from '@/elements';
 import moment from 'moment';
 import { EpisodeProps, SortMode } from 'types';
-import useTitle from '@/hooks/useTitle';
+import useTitle from '@/hooks/useEpisode';
 
 const WatchContainer = styled.div`
     ${tw`flex flex-col gap-y-8 w-full bg-black`}

@@ -34,7 +34,7 @@ export default function useEpisodeData(title_id: string) {
                 );
                 if (episodesResponse.data.message.result) {
                     const episodes: EpisodeProps[] =
-                        episodesResponse.data.message.result;
+                        episodesResponse.data.message.result.data;
 
                     setState((prev) => ({
                         ...prev,
