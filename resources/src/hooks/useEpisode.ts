@@ -32,7 +32,16 @@ export default function useEpisodeData(title_id: string) {
                 const episodesResponse = await axios.get(
                     `/api/titles/${title_id}/episodes`,
                 );
-                if (episodesResponse.data.message.result) {
+                if (!episodesResponse.data.message.result) {
+                    setState((prev) => ({
+                        ...prev,
+                        header: 'Error',
+                        message: 'No episode found',
+                        error: 'No episode found',
+                        loading: false,
+                    }));
+                    return true;
+                } else {
                     const episodes: EpisodeProps[] =
                         episodesResponse.data.message.result.data;
 
@@ -59,6 +68,11 @@ export default function useEpisodeData(title_id: string) {
     };
 
     const pollData = async () => {
+        setState((prev) => ({
+            ...prev,
+            header: 'Loading...',
+            message: 'Fetching episodes',
+        }));
         const success = await fetchData();
         if (!success) {
             pollIntervalRef.current = setTimeout(pollData, 5000);
