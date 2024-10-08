@@ -68,6 +68,8 @@ class ProcessTitle implements ShouldBeUnique {
                     $this->processEpisodes($result['alias'], $result['length']);
                 }
 
+                $title->load('genres');
+
                 return $title->toArray();
             });
         } catch (\Exception $e) {
