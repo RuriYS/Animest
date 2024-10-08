@@ -36,7 +36,7 @@ export default function SearchResult({ id, title, image, year }: Props) {
     const [position, setPosition] = useState({ x: 0, y: 0 });
 
     const fetchDetails = async () => {
-        const { data } = await axios.get(`/api/titles/${id}`);
+        const { data } = await axios.get(`/api/titles/${id}?s=1`);
         if (data.message) {
             const result: Result = data.message.result;
             const genres = result.genres.map((v, _) => v.name);
