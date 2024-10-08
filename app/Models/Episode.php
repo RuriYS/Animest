@@ -24,7 +24,7 @@ class Episode extends Model {
     protected $casts = [
         'id'            => 'string',
         'download_url'  => 'string',
-        'episode_index' => 'string',
+        'episode_index' => 'integer',
         'title_id'      => 'string',
         'upload_date'   => 'string',
         'video'         => 'array',
