@@ -11,8 +11,8 @@ return new class extends Migration {
             $table->string('alias');
             $table->string('title_id');
             $table->text('download_url')->charset('binary')->nullable();
-            $table->string('episode_index')->nullable();
-            $table->string('upload_date')->nullable();
+            $table->integer('episode_index');
+            $table->string('upload_date');
             $table->json('video')->nullable();
             $table->timestamps();
 
