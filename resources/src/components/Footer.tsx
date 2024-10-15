@@ -32,7 +32,7 @@ const Footer = () => {
             <Constraint>
                 <LinksContainer>
                     <FooterLink to='/' variant='bold'>
-                        Animest.land
+                        Animest
                     </FooterLink>
                     <FooterLink to='/terms' variant='small'>
                         Terms & Conditions

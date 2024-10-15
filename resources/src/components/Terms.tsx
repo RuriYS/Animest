@@ -118,9 +118,9 @@ const Terms = () => {
                 <Paragraph>
                     If you have any questions about these Terms, please contact
                     us at
-                    <Link href='mailto:mail@animest.land'>
+                    <Link href='mailto:mail@animest.xyz'>
                         {' '}
-                        mail@animest.land
+                        mail@animest.xyz
                     </Link>
                 </Paragraph>
             </Section>
