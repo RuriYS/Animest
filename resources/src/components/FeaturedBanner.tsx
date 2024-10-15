@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { FaCirclePlay } from 'react-icons/fa6';
 import { FaInfoCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
@@ -9,6 +9,16 @@ import Constraint from '@/components/Constraint';
 const FeaturedBanner = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const featured = [
+        {
+            id: 'fumetsu-no-anata-e',
+            episode: 1,
+            title: 'To Your Eternity',
+            brief: 'An Orb, known only as It, is cast to Earth to be observed from afar. Capable of changing forms from beings whose reflections It captures.',
+            banner: {
+                type: 'video',
+                src: 'videos/fumetsunoanatae.mp4',
+            },
+        },
         {
             id: 'shikanoko-nokonoko-koshitantan',
             episode: 1,
@@ -21,15 +31,9 @@ const FeaturedBanner = () => {
         },
     ];
 
-    useEffect(() => {
-        const switchBanner = () => {
-            setCurrentIndex((prev) => (prev + 1) % featured.length);
-        };
-
-        const interval = setInterval(switchBanner, 8000);
-
-        return () => clearInterval(interval);
-    }, [featured.length]);
+    const switchBanner = () => {
+        setCurrentIndex((prev) => (prev + 1) % featured.length);
+    };
 
     return (
         <div className={'relative h-[60vh] w-full'}>
@@ -38,7 +42,7 @@ const FeaturedBanner = () => {
                     src={featured[currentIndex].banner.src}
                     autoPlay
                     muted
-                    loop
+                    onEnded={switchBanner}
                     className={'object-cover w-full h-full'}
                 />
             ) : (
