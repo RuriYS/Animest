@@ -1,19 +1,12 @@
+<img src="public/Animest_EntryHead_2K.png" alt="Animest Banner">
 
-# Animest
-
-Animest is an anime scraper designed to efficiently gather anime data from various streaming sites. It organizes and maintains a comprehensive anime library, providing users with seamless access to the latest streams. Ideal for building your personal collection or staying updated with the latest releases, Animest streamlines the process of managing anime content.
+**Animest** is an anime scraper designed to efficiently gather anime data from various streaming sites. It organizes and maintains a comprehensive anime library, providing users with seamless access to the latest streams. Ideal for building your personal collection or staying updated with the latest releases, Animest streamlines the process of managing anime content.
 
 ## Source Libraries
 
 - GogoAnime
 - Vidstream
 - MyAnimeList
-
-## Features
-
-- Scrapes from massive anime libraries
-- Scrapes video streams from different servers
-- Efficiently saves library to its own databases
 
 ## Prerequisites
 
@@ -22,7 +15,7 @@ Animest is an anime scraper designed to efficiently gather anime data from vario
 
 ## Installation
 
-Using composer
+Using [Composer](https://getcomposer.org/) and [Yarn](https://yarnpkg.com/)
 
 ```bash
   composer install
@@ -31,4 +24,4 @@ Using composer
 
 ## Authors
 
-- [@RuriXD](https://github.com/RuriXD)
+- [Ruri (@Lixx420)](https://github.com/Lixx420)
