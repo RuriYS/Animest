@@ -1,6 +1,6 @@
 <img src="public/Animest_EntryHead_2K.png" alt="Animest Banner">
 
-**Animest** is an anime scraper designed to efficiently gather anime data from various streaming sites. It organizes and maintains a comprehensive anime library, providing users with seamless access to the latest streams. Ideal for building your personal collection or staying updated with the latest releases, Animest streamlines the process of managing anime content.
+**Animest** is an anime scraper and library designed to efficiently gather anime data from various streaming sites and libraries, providing friendly UI, seamless access to latest streams, building personal collections, and staying updated with latest releases.
 
 ## Source Libraries
 
