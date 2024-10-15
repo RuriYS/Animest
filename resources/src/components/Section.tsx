@@ -6,8 +6,9 @@ import axios from 'axios';
 
 import { Constraint } from '@/elements';
 import { Button } from '@/components/ui/button';
+import SectionCard from '@/elements/SectionCard';
 
-interface Result {
+export interface Title {
     id: string;
     title: string;
     thumbnail: string;
@@ -15,14 +16,14 @@ interface Result {
     latest_episode_id: string;
 }
 
-interface Props {
+export interface Props {
     header: string;
     category: string;
     maxpage: number | undefined;
 }
 
 export default function Section({ category, header, maxpage = 5 }: Props) {
-    const [titles, setTitles] = useState<Result[]>([]);
+    const [titles, setTitles] = useState<Title[]>([]);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [scrollAmount, setScrollAmount] = useState(0);
     const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function Section({ category, header, maxpage = 5 }: Props) {
                 );
                 setTitles((prevTitles) => {
                     const uniqueTitles = data.list.filter(
-                        (newTitle: Result) =>
+                        (newTitle: Title) =>
                             !prevTitles.some(
                                 (title) => title.id === newTitle.id,
                             ),
@@ -92,8 +93,9 @@ export default function Section({ category, header, maxpage = 5 }: Props) {
                         >
                             {titles &&
                                 titles.map((item) => {
-                                    const [alias, episode_index] =
-                                        parseEpisodeId(item.latest_episode_id);
+                                    const [_, episode_index] = parseEpisodeId(
+                                        item.latest_episode_id,
+                                    );
 
                                     const genres = item.genres.map(
                                         (i) =>
@@ -101,53 +103,11 @@ export default function Section({ category, header, maxpage = 5 }: Props) {
                                             i.substring(1),
                                     );
                                     return (
-                                        <div
-                                            key={item.latest_episode_id}
-                                            className='relative flex-none w-[32%] sm:w-[23%] md:w-[18%] lg:w-[15%] xl:w-[12%] cursor-pointer group/item'
-                                            onClick={() =>
-                                                navigate(
-                                                    `/watch/${item.id}/episode/${episode_index}`,
-                                                )
-                                            }
-                                        >
-                                            <div className='relative w-full pb-[150%] overflow-hidden rounded-md'>
-                                                <img
-                                                    src={item.thumbnail}
-                                                    alt={item.title}
-                                                    className='absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 ease-in-out group-hover/item:scale-110'
-                                                />
-                                                <div className='absolute inset-0 bg-black bg-opacity-50 transition-opacity duration-300 ease-in-out group-hover/item:bg-opacity-75'>
-                                                    <div className='absolute bottom-0 left-0 right-0 p-2 sm:p-4 transform translate-y-2 transition-transform duration-300 ease-in-out group-hover/item:translate-y-0'>
-                                                        <h3 className='text-white font-bold text-xs lg:text-sm truncate'>
-                                                            {item.title}
-                                                        </h3>
-                                                        <p className='text-white text-xs lg:text-sm opacity-75 group-hover/item:opacity-100 transition-opacity duration-300 ease-in-out'>
-                                                            {genres &&
-                                                                `${genres[0]}${
-                                                                    genres.length >
-                                                                    1
-                                                                        ? `, ${genres[1]}`
-                                                                        : ''
-                                                                }`}
-                                                        </p>
-                                                        <div className='flex space-x-2 -mt-4 group-hover/item:mt-2 opacity-0 group-hover/item:opacity-100 transition-all duration-300 ease-in-out transform translate-y-2 group-hover/item:translate-y-0'>
-                                                            <Button
-                                                                size='sm'
-                                                                className='w-full bg-white text-black hover:bg-white/90 text-xs sm:text-sm'
-                                                            >
-                                                                <Link
-                                                                    to={`/watch/${item.id}/episode/${episode_index}`}
-                                                                    className='text-black flex'
-                                                                >
-                                                                    <Play className='mr-1 h-3 w-3 sm:h-4 sm:w-4' />
-                                                                    {' Play'}
-                                                                </Link>
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <SectionCard
+                                            item={item}
+                                            genres={genres}
+                                            episode_index={episode_index || '1'}
+                                        />
                                     );
                                 })}
                         </div>

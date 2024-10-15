@@ -12,6 +12,7 @@ import {
     defaultLayoutIcons,
     DefaultVideoLayout,
 } from '@vidstack/react/player/layouts/default';
+
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/video.css';
 
@@ -47,7 +48,7 @@ const config: Partial<HlsConfig> = {
 
 function onProviderChange(
     provider: MediaProviderAdapter | null,
-    nativeEvent: MediaProviderChangeEvent,
+    _nativeEvent: MediaProviderChangeEvent,
 ) {
     if (isHLSProvider(provider)) {
         console.info('Player', 'Changed HLS Provider');
@@ -77,6 +78,7 @@ const PlayerWrapper: React.FC<MediaPlayerWrapperProps> = ({
 
     return (
         <MediaPlayer
+            className='max-h-screen'
             ref={playerRef}
             onEnd={onEnd}
             title={title}

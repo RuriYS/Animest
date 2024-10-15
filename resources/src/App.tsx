@@ -1,8 +1,8 @@
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { Header, Footer, LoadingFallback } from '@/components';
 import GlobalStyles from '@/styles/GlobalStyles';
 import MainContainer from '@/elements/MainContainer';
-import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import Routes from '@/Routes';
 

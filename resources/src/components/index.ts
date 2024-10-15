@@ -1,15 +1,17 @@
-import Title from './Title';
-import Footer from './Footer';
-import Header from './Header';
-import Home from './Home';
-import LoadingFallback from './LoadingFallback';
-import News from './News';
-import Queues from './Queues';
-import Search from './Browse';
-import Terms from './Terms';
-import Section from './Section';
-import Watch from './Watch';
-import FourOFour from './404';
+import { lazy } from 'react';
+
+const Title = lazy(() => import('./Title'));
+const Footer = lazy(() => import('./Footer'));
+const Header = lazy(() => import('./Header'));
+const Home = lazy(() => import('./Home'));
+const LoadingFallback = lazy(() => import('./LoadingFallback'));
+const News = lazy(() => import('./News'));
+const Queues = lazy(() => import('./Queues'));
+const Search = lazy(() => import('./Browse'));
+const Terms = lazy(() => import('./Terms'));
+const Section = lazy(() => import('./Section'));
+const Watch = lazy(() => import('./Watch'));
+const FourOFour = lazy(() => import('./404'));
 
 export {
     Title,

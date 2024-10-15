@@ -60,7 +60,6 @@ h1 {
 p {
     font-weight: 500;
     font-size: 0.8rem;
-    color: hsl(var(--muted-foreground));
 }
 
 video {

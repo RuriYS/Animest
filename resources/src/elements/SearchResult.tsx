@@ -36,10 +36,12 @@ export default function SearchResult({ id, title, image, year }: Props) {
     const [position, setPosition] = useState({ x: 0, y: 0 });
 
     const fetchDetails = async () => {
-        const { data } = await axios.get(`/api/titles/${id}?s=1`);
+        const { data } = await axios.get(`/api/titles/${id}`);
         if (data.message) {
             const result: Result = data.message.result;
-            const genres = result.genres.map((v, _) => v.name);
+            const genres = result.genres
+                ? result.genres.map((v, _) => v.name)
+                : [];
             setDetails({
                 summary: result.description as string,
                 genres: genres,
@@ -230,13 +232,15 @@ export default function SearchResult({ id, title, image, year }: Props) {
                                                 animate={{ opacity: 1 }}
                                                 transition={{ duration: 0.5 }}
                                             >
-                                                <p className='text-xs text-gray-300 mb-3'>
-                                                    Genres:{' '}
-                                                    {details &&
-                                                        details.genres.join(
-                                                            ', ',
-                                                        )}
-                                                </p>
+                                                {details.genres.length > 0 && (
+                                                    <p className='text-xs text-gray-300 mb-3'>
+                                                        Genres:{' '}
+                                                        {details &&
+                                                            details.genres.join(
+                                                                ', ',
+                                                            )}
+                                                    </p>
+                                                )}
                                             </motion.div>
                                             <div className='flex space-x-3 mb-4'>
                                                 <Button

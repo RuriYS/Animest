@@ -32,29 +32,36 @@ export default function useEpisodeData(title_id: string) {
                 const episodesResponse = await axios.get(
                     `/api/titles/${title_id}/episodes`,
                 );
-                if (!episodesResponse.data.message.result) {
-                    setState((prev) => ({
-                        ...prev,
-                        header: 'Error',
-                        message: 'No episode found',
-                        error: 'No episode found',
-                        loading: false,
-                    }));
-                    return true;
-                } else {
-                    const episodes: EpisodeProps[] =
-                        episodesResponse.data.message.result.data;
 
-                    setState((prev) => ({
-                        ...prev,
-                        episodes,
-                        loading: false,
-                    }));
-                    return true;
+                switch (episodesResponse.status) {
+                    case 202:
+                        setState((prev) => ({
+                            ...prev,
+                            message: 'Episodes currently in queue',
+                            loading: true,
+                        }));
+                        return true;
+                    case 200:
+                        const episodes: EpisodeProps[] =
+                            episodesResponse.data.message.result.data;
+
+                        setState((prev) => ({
+                            ...prev,
+                            episodes,
+                            loading: false,
+                        }));
+                        return true;
+                    default:
+                        setState((prev) => ({
+                            ...prev,
+                            header: 'Error',
+                            message: 'Unexpected error',
+                            loading: false,
+                        }));
+                        return true;
                 }
             }
-            return false;
-        } catch (error) {
+        } catch (error: any) {
             setState((prev) => ({
                 ...prev,
                 error:
@@ -62,17 +69,14 @@ export default function useEpisodeData(title_id: string) {
                         ? error.message
                         : 'An error occurred',
                 loading: false,
+                header: 'Error',
+                message: error.message,
             }));
-            return false;
+            return true;
         }
     };
 
     const pollData = async () => {
-        setState((prev) => ({
-            ...prev,
-            header: 'Loading...',
-            message: 'Fetching episodes',
-        }));
         const success = await fetchData();
         if (!success) {
             pollIntervalRef.current = setTimeout(pollData, 5000);
@@ -89,5 +93,8 @@ export default function useEpisodeData(title_id: string) {
         };
     }, [title_id]);
 
+    useEffect(() => {
+        console.debug('useEpisode', state);
+    }, [state]);
     return state;
 }

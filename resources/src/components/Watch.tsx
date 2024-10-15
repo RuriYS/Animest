@@ -21,7 +21,7 @@ export default function Watch() {
     const navigate = useNavigate();
     const { id, index } = useParams<{
         id: string;
-        index?: string;
+        index: string;
     }>();
     const {
         loading,
@@ -96,12 +96,11 @@ export default function Watch() {
     }, []);
 
     useEffect(() => {
-        if (episodes) {
-            const episode =
-                episodes?.find(
-                    (episode) => episode.episode_index === (index ?? '1'),
-                ) ?? episodes[0];
-            return setCurrentEpisode(episode);
+        if (episodes && index) {
+            const episode = episodes.find(
+                (episode) => episode.episode_index == index,
+            );
+            return setCurrentEpisode(episode!);
         }
     }, [episodes, index]);
 
@@ -135,21 +134,35 @@ export default function Watch() {
                         }`}
                         onEnd={handleEpisodeEnd}
                     />
-                    <div className='grid px-2 gap-2 lg:grid-cols-2 lg:px-8 lg:gap-4'>
-                        <EpisodeInfo
-                            meta={meta!}
-                            episode={currentEpisode!}
-                            views={currentEpisode!.views}
-                        />
-                        <EpisodeList
-                            meta={meta!}
-                            episodes={currentEpisodes}
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                            onSortChange={handleSortChange}
-                        />
-                    </div>
+                    {meta && currentEpisode && (
+                        <div className='flex flex-col gap-4 px-2 lg:px-8'>
+                            <div className='px-3'>
+                                <h1 className='text-2xl font-semibold'>
+                                    {meta.title}
+                                </h1>
+                                <h2 className='font-semibold'>
+                                    Episode {currentEpisode?.episode_index}
+                                    {meta.language &&
+                                        ` (${meta.language[0].toUpperCase()}ubbed)`}
+                                </h2>
+                            </div>
+                            <div className='grid gap-2 lg:grid-cols-2 lg:gap-4'>
+                                <EpisodeInfo
+                                    meta={meta!}
+                                    episode={currentEpisode!}
+                                    views={currentEpisode!.views}
+                                />
+                                <EpisodeList
+                                    meta={meta}
+                                    episodes={currentEpisodes}
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    onSortChange={handleSortChange}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </WatchContainer>
             )}
         </Constraint>
