@@ -20,8 +20,9 @@ class EnvironmentServiceProvider extends ServiceProvider {
         $environment  = app()->environment();
         $database     = config('database.default');
         $databaseName = config("database.connections.$database.database");
-
-        $message = "Environment: $environment, Database: $databaseName";
-        view()->share('envInfo', $message);
+        view()->share([
+            'env' => $environment,
+            'db'  => $databaseName,
+        ]);
     }
 }

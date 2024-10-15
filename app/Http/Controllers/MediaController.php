@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessTitle;
 use App\Models\Title;
 use App\Models\Episode;
-use App\Utils\CacheUtils;
+use App\Utils\CacheManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -52,77 +52,77 @@ class MediaController extends ControllerAbstract {
     }
 
     protected function makeResponse() {
-        $cached = CacheUtils::getMediaCache($this->key);
+        // Log::debug('[makeResponse]');
+        Log::debug('[makeResponse] Creating response', ['title_id' => $this->title_id]);
 
-        if ($cached) {
-            return $cached;
-        }
+        $ttl = floor(now()->diffInSeconds(now()->addHours(4)));
 
-        $result = $this->isEpisode ? $this->getEpisode() : $this->getTitle();
-        $status = !empty($result['data']) || $result['status'];
+        return CacheManager::setOrGet($this->key, $ttl, function () {
+            Log::debug('[makeResponse] No cache found, creating one', ['title_id' => $this->title_id]);
 
-        $cache_rule = in_array(true, [
-            $this->refresh,
-            $this->sync,
-            empty($result['data']) && $status,
-        ]);
+            $result = $this->isEpisode ? $this->getEpisode() : $this->getTitle();
+            $status = !empty($result['data']) || $result['status'];
 
-        if (!$cache_rule) {
-            CacheUtils::updateMediaCache($this->key, $result['data']);
-        }
 
-        return [
-            'result' => $result['data'],
-            'status' => $status,
-            'ttl'    => $cache_rule ? null : floor(now()->diffInSeconds(now()->addHours(4))),
-            'age'    => $cache_rule ? null : 0,
-        ];
+            Log::debug('[makeResponse] New cache', [
+                'title_id' => $this->title_id,
+                'result'   => json_encode($result),
+                'status'   => $status,
+            ]);
+            return $result['data'];
+        });
     }
 
+
     protected function getTitle($process_eps = false, $refresh_eps = false) {
-        $result = Title::find($this->title_id);
+        $data   = Title::with('genres')->find($this->title_id);
         $status = false;
 
         if ($this->dispatch) {
             $title  = (array) ProcessTitle::dispatchSync($this->title_id, $process_eps, $refresh_eps);
             $status = !empty($title);
 
-        } elseif ($this->sync || empty($result)) {
-            $result = ProcessTitle::dispatchSync($this->title_id);
-            // $result = Title::with('genres')->find($this->title_id)?->toArray();
+        } elseif ($this->sync || empty($data)) {
+            $data = ProcessTitle::dispatchSync($this->title_id);
         }
 
-        return ['data' => empty($result) ? null : $result, 'status' => $status];
+        $response = ['data' => $data, 'status' => $status];
+
+        Log::debug('[getTitle]', ['response' => $response]);
+
+        return $response;
     }
 
     protected function getEpisode() {
+        Log::debug('[getEpisode] Getting episode', ['title_id' => $this->title_id]);
+
         $title  = Title::find($this->title_id);
         $query  = Episode::where('title_id', $this->title_id);
         $status = false;
 
         if (!$title || $this->dispatch) {
-            $this->getTitle(true, true);
+            Log::debug('[getEpisode] No title found, dispatching.', ['title_id' => $this->title_id]);
+            $title = $this->getTitle(true, true);
         }
 
         if (!$this->episodeIndex) {
+            Log::debug('[getEpisode] No index pos specified, Returning the entire index', ['title_id' => $this->title_id]);
             $episode    = $query->orderBy('episode_index');
-            $pagination = $episode->paginate(10, ['*'], 'p', $this->page);
-            if ($pagination->isNotEmpty()) {
-                $episode = $pagination;
-            } else {
-                $episode = null;
-            }
+            $pagination = $episode->paginate(50, ['*'], 'p', $this->page);
+            $episode    = ($pagination->isNotEmpty()) ? $pagination : null;
         } else {
             $episode = $query->where('episode_index', $this->episodeIndex)->first() ?? null;
         }
 
-        if ($this->sync) {
-            Log::debug('[MediaController] Processing title', ['id' => $this->key]);
+        if (!$episode || $this->sync) {
+            Log::debug('[getEpisode] Syncing episodes', ['title_id' => $this->title_id]);
             $title   = ProcessTitle::dispatchSync($this->title_id, true, true);
             $episode = null;
 
-            if ($title)
+            if ($title) {
                 $status = true;
+                Log::debug('[getEpisode] Finishing up', ['status' => $status, 'title_id' => $this->title_id]);
+            }
         }
 
         return ['data' => $episode, 'status' => $status];

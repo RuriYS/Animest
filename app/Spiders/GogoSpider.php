@@ -12,6 +12,8 @@ use App\Processors\GogoProcessor;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\DomCrawler\Crawler;
 use RoachPHP\Downloader\Middleware\UserAgentMiddleware;
+use RoachPHP\Extensions\LoggerExtension;
+use RoachPHP\Extensions\StatsCollectorExtension;
 
 /*
  |------------------------------------------------------------------------------------------------------------------
@@ -38,7 +40,10 @@ class GogoSpider extends BasicSpider {
         ],
     ];
 
-    public array $extensions = [];
+    public array $extensions = [
+        LoggerExtension::class,
+        StatsCollectorExtension::class,
+    ];
 
     public array $itemProcessors = [
         GogoProcessor::class,

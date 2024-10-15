@@ -3,9 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\EpisodeProcessed;
-use App\Utils\CacheUtils;
+use App\Utils\CacheManager;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class EpisodeListener implements ShouldQueue {
@@ -18,13 +17,13 @@ class EpisodeListener implements ShouldQueue {
             Log::debug('[EpisodeListener] New episode', [$episode->toArray()]);
 
             $singleKey = "episode:$titleId:$episodeIndex";
-            CacheUtils::updateMediaCache($singleKey, $episode);
+            CacheManager::updateMediaCache($singleKey, $episode);
             Log::debug("[EpisodeListener] Episode cache updated", ['key' => $singleKey]);
 
-            // $listKey     = "episodes:$titleId";
-            // $episodeList = $episode->where('title_id', $titleId)->get();
-            // CacheUtils::updateMediaCache($listKey, $episodeList);
-            // Log::debug("[EpisodeListener] Episode list cache updated", ['key' => $listKey]);
+            $listKey     = "episodes:$titleId";
+            $episodeList = $episode->where('title_id', $titleId)->paginate(100, ['*'], 'p', 1);
+            CacheManager::updateMediaCache($listKey, $episodeList);
+            Log::debug("[EpisodeListener] Episode list cache updated", ['key' => $listKey]);
         }
     }
 }
